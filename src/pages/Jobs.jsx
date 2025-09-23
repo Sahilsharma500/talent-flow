@@ -420,18 +420,26 @@ const Jobs = () => {
 
       {/* Modals */}
       {showCreateModal && (
-        <JobModal
-          onClose={() => setShowCreateModal(false)}
-          onJobCreated={fetchJobs}
-        />
-      )}
-      {editingJob && (
-        <JobModal
-          job={editingJob}
-          onClose={() => setEditingJob(null)}
-          onJobUpdated={fetchJobs}
-        />
-      )}
+  <JobModal
+    onClose={() => setShowCreateModal(false)}
+    onSave={() => {
+      fetchJobs();
+      setShowCreateModal(false); // close modal after save
+    }}
+  />
+)}
+
+{editingJob && (
+  <JobModal
+    job={editingJob}
+    onClose={() => setEditingJob(null)}
+    onSave={() => {
+      fetchJobs();
+      setEditingJob(null); // close modal after save
+    }}
+  />
+)}
+
       {showDeleteModal && jobToDelete && (
         <DeleteConfirmationModal
           onClose={() => setShowDeleteModal(false)}

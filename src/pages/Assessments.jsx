@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-hot-toast";
-import { FaEllipsisV, FaExternalLinkAlt, FaEye } from "react-icons/fa"; // Added FaEllipsisV for settings icon
+import { FaEllipsisV, FaExternalLinkAlt, FaEye } from "react-icons/fa";
 
 const Assessments = () => {
   const navigate = useNavigate();
@@ -12,14 +12,14 @@ const Assessments = () => {
   const [loading, setLoading] = useState(true);
   const [selectedJob, setSelectedJob] = useState("");
   const [showBuilder, setShowBuilder] = useState(false);
-  const [openDropdownId, setOpenDropdownId] = useState(null); // State for dropdown visibility
+  const [openDropdownId, setOpenDropdownId] = useState(null);
 
   const fetchData = async () => {
     try {
       setLoading(true);
       const [assessmentsResponse, jobsResponse] = await Promise.all([
         axios.get("/assessments"),
-        axios.get("/jobs?pageSize=100"), // Get all jobs for dropdown
+        axios.get("/jobs?pageSize=100"),
       ]);
 
       setAssessments(assessmentsResponse.data.data);
@@ -35,14 +35,12 @@ const Assessments = () => {
     fetchData();
   }, []);
 
-  // Refresh data when navigating back to this page
   useEffect(() => {
     if (location.pathname === "/dashboard/assessments") {
       fetchData();
     }
   }, [location.pathname]);
 
-  // Refresh data when component becomes visible
   useEffect(() => {
     const handleFocus = () => {
       fetchData();
@@ -57,14 +55,13 @@ const Assessments = () => {
       await axios.delete(`/assessments/${assessmentId}`);
       toast.success("Assessment deleted successfully");
       fetchData();
-      setOpenDropdownId(null); // Close dropdown after action
+      setOpenDropdownId(null);
     } catch (error) {
       console.error("Error deleting assessment:", error);
       toast.error("Error deleting assessment");
     }
   };
 
-  // Close dropdown when clicking outside
   const dropdownRef = useRef(null);
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -101,23 +98,23 @@ const Assessments = () => {
       <div className="mb-8">
         <div className="flex gap-2 justify-between items-center">
           <div>
-            <h1 className="md:text-3xl sm:text-2xl text-xl font-bold text-emerald-600 mb-2">
+            <h1 className="md:text-3xl sm:text-2xl text-xl font-bold text-indigo-600 mb-2">
               Assessments
             </h1>
-            <p className="text-emerald-600/90 sm:text-sm text-xs">
+            <p className="text-indigo-600/90 sm:text-sm text-xs">
               Create and manage candidate assessments
             </p>
           </div>
           <div className="flex space-x-3">
             <button
               onClick={() => {
-                if (selectedJob && showBuilder) { // Only navigate if a job is selected and builder is shown
+                if (selectedJob && showBuilder) {
                   navigate(`/assessments/builder/${selectedJob}`);
                 } else {
                   setShowBuilder(true);
                 }
               }}
-              className="bg-emerald-600 cursor-pointer text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors duration-200 flex items-center space-x-2"
+              className="bg-indigo-600 cursor-pointer text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors duration-200 flex items-center space-x-2"
             >
               <svg
                 className="w-4 h-4"
@@ -138,7 +135,7 @@ const Assessments = () => {
               <button
                 onClick={() => {
                   setShowBuilder(false);
-                  setSelectedJob(""); // Clear selected job when cancelling
+                  setSelectedJob("");
                 }}
                 className="bg-gray-200 cursor-pointer text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 transition-colors duration-200 flex items-center space-x-2"
               >
@@ -149,7 +146,6 @@ const Assessments = () => {
         </div>
       </div>
 
-      {/* Job Selection */}
       {showBuilder && (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
           <h2 className="text-lg font-medium text-gray-900 mb-4">
@@ -161,7 +157,7 @@ const Assessments = () => {
                 key={job.id}
                 className={`p-4 border rounded-lg cursor-pointer transition-colors duration-200 ${
                   selectedJob === job.id
-                    ? "border-emerald-500 bg-emerald-50"
+                    ? "border-indigo-500 bg-indigo-50"
                     : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
                 }`}
                 onClick={() => setSelectedJob(job.id)}
@@ -176,7 +172,7 @@ const Assessments = () => {
             <div className="mt-6 flex justify-end space-x-3">
               <button
                 onClick={() => navigate(`/assessments/builder/${selectedJob}`)}
-                className="px-4 py-2 cursor-pointer bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors duration-200"
+                className="px-4 py-2 cursor-pointer bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors duration-200"
               >
                 Proceed to Builder
               </button>
@@ -185,7 +181,6 @@ const Assessments = () => {
         </div>
       )}
 
-      {/* Assessments List */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         {assessments.length === 0 ? (
           <div className="text-center py-6">
@@ -216,14 +211,13 @@ const Assessments = () => {
               return (
                 <div
                   key={assessment.id}
-                  className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-[1.02] flex flex-col justify-between relative" // Added relative for dropdown positioning
+                  className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-all duration-300 transform hover:scale-[1.02] flex flex-col justify-between relative"
                 >
-                  {/* Settings Dropdown */}
                   <div className="absolute top-4 right-0.5 z-10" ref={openDropdownId === assessment.id ? dropdownRef : null}>
                     <button
                       className="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors"
                       onClick={(e) => {
-                        e.stopPropagation(); // Prevent card hover/click from interfering
+                        e.stopPropagation();
                         setOpenDropdownId(openDropdownId === assessment.id ? null : assessment.id);
                       }}
                     >
@@ -253,7 +247,6 @@ const Assessments = () => {
                     )}
                   </div>
 
-                  {/* Assessment Details */}
                   <div className="flex-1 mb-4">
                     <h3 className="text-xl font-semibold text-gray-900 mb-2 leading-tight">
                       Assessment for {job?.title || "Unknown Job"}
@@ -261,7 +254,7 @@ const Assessments = () => {
                     <p className="text-sm text-gray-600 mb-3">
                       {job?.jobType} • {job?.location}
                     </p>
-                    <span className="px-3 py-1 text-xs font-medium rounded-full bg-emerald-100 text-emerald-800">
+                    <span className="px-3 py-1 text-xs font-medium rounded-full bg-indigo-100 text-indigo-800">
                       {assessment.sections.length} sections
                     </span>
                     <p className="text-sm text-gray-600 font-semibold mt-3">
@@ -273,14 +266,13 @@ const Assessments = () => {
                     </p>
                   </div>
 
-                  {/* Bottom Action Buttons */}
                   <div className="mt-auto pt-4 border-t border-gray-200 flex space-x-3">
                     <button
                       onClick={(e) => {
                         e.stopPropagation();
                         navigate(`/assessments/preview/${assessment.jobId}`);
                       }}
-                      className="flex-1 flex items-center justify-center px-4 py-2 bg-emerald-50 text-emerald-800 rounded-md hover:bg-emerald-100 transition-colors duration-200 text-sm font-medium"
+                      className="flex-1 flex items-center justify-center px-4 py-2 bg-indigo-50 text-indigo-800 rounded-md hover:bg-indigo-100 transition-colors duration-200 text-sm font-medium"
                     >
                       <FaEye className="mr-2" />
                       Preview
@@ -290,7 +282,7 @@ const Assessments = () => {
                         e.stopPropagation();
                         navigate(`/assessments/results/${assessment.jobId}`);
                       }}
-                      className="flex-1 flex items-center justify-center px-4 py-2 bg-emerald-50 text-emerald-800 rounded-md hover:bg-emerald-100 transition-colors duration-200 text-sm font-medium"
+                      className="flex-1 flex items-center justify-center px-4 py-2 bg-indigo-50 text-indigo-800 rounded-md hover:bg-indigo-100 transition-colors duration-200 text-sm font-medium"
                     >
                       <FaExternalLinkAlt className="mr-2" />
                       View Responses

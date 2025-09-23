@@ -134,7 +134,61 @@ const AssessmentResultsPage = () => {
   const PIE_COLORS = ['#34D399', '#F87171'];
 
   if (loading) {
-    return <div className="p-8 text-center">Loading...</div>;
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="animate-pulse">
+          {/* Header Skeleton */}
+          <div className="flex justify-between items-center mb-8">
+            <div className="h-8 bg-gray-200 rounded w-64"></div>
+            <div className="h-6 bg-gray-200 rounded w-32"></div>
+          </div>
+          
+          {/* Analytics Panel Skeleton */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <div className="h-4 bg-gray-200 rounded w-2/3 mb-2"></div>
+                <div className="h-8 bg-gray-200 rounded w-1/2"></div>
+              </div>
+            ))}
+          </div>
+
+          {/* Charts Section Skeleton */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 h-96">
+              <div className="h-6 bg-gray-200 rounded w-1/2 mb-4"></div>
+              <div className="h-72 bg-gray-200 rounded"></div>
+            </div>
+            <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 h-96">
+              <div className="h-6 bg-gray-200 rounded w-1/2 mb-4"></div>
+              <div className="h-72 bg-gray-200 rounded"></div>
+            </div>
+          </div>
+
+          {/* Candidate List Skeleton */}
+          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+              <div className="h-6 bg-gray-200 rounded w-1/4"></div>
+              <div className="h-6 bg-gray-200 rounded w-24"></div>
+            </div>
+            <div className="divide-y divide-gray-200">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="p-6 flex items-center justify-between">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-10 h-10 rounded-full bg-gray-200"></div>
+                    <div>
+                      <div className="h-4 bg-gray-200 rounded w-32 mb-1"></div>
+                      <div className="h-3 bg-gray-200 rounded w-24"></div>
+                    </div>
+                  </div>
+                  <div className="h-8 bg-gray-200 rounded w-16"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   if (!assessment || responses.length === 0) {
@@ -154,10 +208,10 @@ const AssessmentResultsPage = () => {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="md:text-3xl sm:text-2xl text-xl font-bold text-gray-900 mb-2">
+          <h1 className="md:text-3xl sm:text-2xl text-xl font-bold text-indigo-700/90 mb-2">
             Results for "{assessment.title}"
           </h1>
-          <p className="sm:text-sm text-xs text-gray-600">
+          <p className="sm:text-sm text-xs text-indigo-600/90">
             Analytics and candidate responses for this assessment.
           </p>
         </div>
@@ -167,11 +221,11 @@ const AssessmentResultsPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <p className="text-sm font-medium text-gray-500">Total Responses</p>
-          <p className="text-3xl font-bold text-gray-900">{analytics.total}</p>
+          <p className="text-3xl font-bold text-indigo-700/90">{analytics.total}</p>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <p className="text-sm font-medium text-gray-500">Average Score</p>
-          <p className="text-3xl font-bold text-gray-900">{analytics.average}%</p>
+          <p className="text-3xl font-bold text-indigo-700/90">{analytics.average}%</p>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <p className="text-sm font-medium text-gray-500">Above 70%</p>
@@ -179,7 +233,7 @@ const AssessmentResultsPage = () => {
         </div>
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
           <p className="text-sm font-medium text-gray-500">Above 60%</p>
-          <p className="text-3xl font-bold text-blue-600">{analytics.above60}%</p>
+          <p className="text-3xl font-bold text-indigo-700/90">{analytics.above60}%</p>
         </div>
       </div>
       
@@ -230,7 +284,7 @@ const AssessmentResultsPage = () => {
           </h2>
           <button
             onClick={handleSortByScore}
-            className="flex items-center text-sm font-medium text-gray-700 hover:text-emerald-600"
+            className="flex items-center text-sm font-medium text-gray-700 hover:text-indigo-600"
           >
             Sort by Score {getSortIcon()}
           </button>

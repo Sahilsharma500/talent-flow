@@ -84,7 +84,6 @@ const AssessmentPreview = () => {
     return () => clearInterval(intervalRef.current);
   }, [testStarted, previewComplete, assessment, currentSectionIndex, currentQuestionIndex, timer]);
 
-  // Handlers for state changes
   const handleResponseChange = (questionId, value) => {
     setResponses((prev) => ({
       ...prev,
@@ -100,7 +99,6 @@ const AssessmentPreview = () => {
     const isLastSection = currentSectionIndex === assessment.sections.length - 1;
 
     if (isLastQuestionInSection && isLastSection) {
-      // End of preview, don't submit to DB or local storage
       setPreviewComplete(true);
     } else if (isLastQuestionInSection) {
       setCurrentSectionIndex((prev) => prev + 1);
@@ -108,10 +106,10 @@ const AssessmentPreview = () => {
     } else {
       setCurrentQuestionIndex((prev) => prev + 1);
     }
-    setTimer(null); // Reset timer for next question
+    setTimer(null);
   };
 
-  // Conditional render functions
+  // Render loading skeleton
   const renderLoading = () => (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="animate-pulse">
@@ -134,7 +132,7 @@ const AssessmentPreview = () => {
         </h1>
         <button
           onClick={() => navigate("/jobs")}
-          className="bg-emerald-600 cursor-pointer text-white px-4 py-2 rounded-lg hover:bg-emerald-700"
+          className="bg-indigo-600 cursor-pointer text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
         >
           Back
         </button>
@@ -156,12 +154,6 @@ const AssessmentPreview = () => {
               <h1 className="text-2xl font-bold text-gray-900">
                 Assessment for {job.title}
               </h1>
-              <button
-                onClick={() => navigate("/dashboard/assessments")}
-                className="px-4 py-2 text-gray-900 border border-gray-300 rounded-lg hover:bg-gray-50"
-              >
-                Back
-              </button>
             </div>
             <p className="text-gray-600 mb-8">{job.jobType} • {job.location}</p>
 
@@ -200,19 +192,19 @@ const AssessmentPreview = () => {
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Instructions</h2>
                 <ul className="list-disc list-inside space-y-2 text-gray-700">
                   <li>This is a timed assessment. Once the timer starts, you cannot go back to previous questions.</li>
-                  <li>Your responses will **not** be saved. This is a preview.</li>
+                  <li>Your responses will <strong>not</strong> be saved. This is a preview.</li>
                   <li>The preview will end upon completion or when the time for each question runs out.</li>
                   <li>Please ensure you have a stable internet connection.</li>
                 </ul>
                 <div className="mt-6">
                   <h3 className="text-lg font-semibold text-gray-900 mb-2">Timing per Question Type:</h3>
                   <ul className="list-disc list-inside space-y-1 text-gray-700">
-                    <li>Single-Choice: **30 seconds**</li>
-                    <li>Multiple-Choice: **40 seconds**</li>
-                    <li>Short-Answer: **1 minute**</li>
-                    <li>Numerical: **2 minutes**</li>
-                    <li>Long-Answer: **10 minutes**</li>
-                    <li>File-Upload: **No time limit**</li>
+                    <li>Single-Choice: <strong>30 seconds</strong></li>
+                    <li>Multiple-Choice: <strong>40 seconds</strong></li>
+                    <li>Short-Answer: <strong>1 minute</strong></li>
+                    <li>Numerical: <strong>2 minutes</strong></li>
+                    <li>Long-Answer: <strong>10 minutes</strong></li>
+                    <li>File-Upload: <strong>No time limit</strong></li>
                   </ul>
                 </div>
               </div>
@@ -221,7 +213,7 @@ const AssessmentPreview = () => {
             <div className="mt-8 flex justify-center">
               <button
                 onClick={() => setTestStarted(true)}
-                className="px-8 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-bold text-lg transition-colors"
+                className="px-8 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-bold text-lg transition-colors"
               >
                 Start Test
               </button>
@@ -237,15 +229,12 @@ const AssessmentPreview = () => {
     const currentQuestion = currentSection.questions[currentQuestionIndex];
     const isLastQuestion = currentQuestionIndex === currentSection.questions.length - 1 && currentSectionIndex === assessment.sections.length - 1;
 
-    // Determine if the current question has a timer
     const hasTimer = questionTimings[currentQuestion.type] !== null;
 
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">
-            {currentSection.title}
-          </h1>
+          <h1 className="text-2xl font-bold text-gray-900">{currentSection.title}</h1>
           {hasTimer && (
             <div className="text-xl font-bold text-gray-800 bg-gray-200 px-4 py-2 rounded-lg">
               Time Left: {timer !== null ? timer : "..."}s
@@ -257,30 +246,27 @@ const AssessmentPreview = () => {
             <div key={currentQuestion.id} className="space-y-4">
               <label className="block text-lg font-medium text-gray-800">
                 {currentQuestionIndex + 1}. {currentQuestion.question}
-                {currentQuestion.required && (
-                  <span className="text-red-500 ml-1">*</span>
-                )}
+                {currentQuestion.required && <span className="text-red-500 ml-1">*</span>}
               </label>
 
-              {/* Input rendering based on question type */}
-              {currentQuestion.type === "single-choice" &&
-                currentQuestion.options && (
-                  <div className="space-y-2">
-                    {currentQuestion.options.map((option, index) => (
-                      <label key={index} className="flex items-center">
-                        <input
-                          type="radio"
-                          name={currentQuestion.id}
-                          value={option}
-                          checked={responses[currentQuestion.id] === option}
-                          onChange={(e) => handleResponseChange(currentQuestion.id, e.target.value)}
-                          className="mr-3"
-                        />
-                        <span className="text-sm text-gray-700">{option}</span>
-                      </label>
-                    ))}
-                  </div>
-                )}
+              {/* Input fields */}
+              {currentQuestion.type === "single-choice" && currentQuestion.options && (
+                <div className="space-y-2">
+                  {currentQuestion.options.map((option, index) => (
+                    <label key={index} className="flex items-center">
+                      <input
+                        type="radio"
+                        name={currentQuestion.id}
+                        value={option}
+                        checked={responses[currentQuestion.id] === option}
+                        onChange={(e) => handleResponseChange(currentQuestion.id, e.target.value)}
+                        className="mr-3"
+                      />
+                      <span className="text-sm text-gray-700">{option}</span>
+                    </label>
+                  ))}
+                </div>
+              )}
 
               {currentQuestion.type === "multi-choice" && currentQuestion.options && (
                 <div className="space-y-2">
@@ -309,7 +295,7 @@ const AssessmentPreview = () => {
                   type="text"
                   value={responses[currentQuestion.id] || ""}
                   onChange={(e) => handleResponseChange(currentQuestion.id, e.target.value)}
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   placeholder="Enter your answer..."
                 />
               )}
@@ -319,7 +305,7 @@ const AssessmentPreview = () => {
                   value={responses[currentQuestion.id] || ""}
                   onChange={(e) => handleResponseChange(currentQuestion.id, e.target.value)}
                   rows={6}
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   placeholder="Enter your detailed answer..."
                 />
               )}
@@ -329,7 +315,7 @@ const AssessmentPreview = () => {
                   type="number"
                   value={responses[currentQuestion.id] || ""}
                   onChange={(e) => handleResponseChange(currentQuestion.id, e.target.value)}
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   placeholder="Enter a number..."
                 />
               )}
@@ -352,30 +338,24 @@ const AssessmentPreview = () => {
                   <p className="mt-2 text-sm text-gray-600">
                     Click to upload or drag and drop
                   </p>
-                  <p className="text-xs text-gray-500">
-                    PNG, JPG, PDF up to 10MB
-                  </p>
+                  <p className="text-xs text-gray-500">PNG, JPG, PDF up to 10MB</p>
                   <input
                     type="file"
                     className="hidden"
                     id={`file-${currentQuestion.id}`}
                     onChange={(e) => {
                       const file = e.target.files?.[0];
-                      if (file) {
-                        handleResponseChange(currentQuestion.id, file.name);
-                      }
+                      if (file) handleResponseChange(currentQuestion.id, file.name);
                     }}
                   />
                   <label
                     htmlFor={`file-${currentQuestion.id}`}
-                    className="mt-2 inline-block px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 cursor-pointer"
+                    className="mt-2 inline-block px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 cursor-pointer"
                   >
                     Choose File
                   </label>
                   {responses[currentQuestion.id] && (
-                    <p className="mt-2 text-sm text-gray-600">
-                      Selected: {responses[currentQuestion.id]}
-                    </p>
+                    <p className="mt-2 text-sm text-gray-600">Selected: {responses[currentQuestion.id]}</p>
                   )}
                 </div>
               )}
@@ -385,8 +365,8 @@ const AssessmentPreview = () => {
         <div className="mt-6 flex justify-end">
           <button
             onClick={handleNextQuestion}
-            className={`px-6 py-3 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-bold transition-colors ${
-              isLastQuestion ? "bg-emerald-800 hover:bg-emerald-900" : ""
+            className={`px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-bold transition-colors ${
+              isLastQuestion ? "bg-indigo-800 hover:bg-indigo-900" : ""
             }`}
           >
             {isLastQuestion ? "Finish Preview" : "Next Question"}
@@ -399,31 +379,23 @@ const AssessmentPreview = () => {
   const renderPreviewComplete = () => (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="text-center">
-        <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100 mb-4">
+        <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 mb-4">
           <svg
-            className="h-6 w-6 text-green-600"
+            className="h-6 w-6 text-indigo-600"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M5 13l4 4L19 7"
-            />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
           </svg>
         </div>
-        <h1 className="text-2xl font-bold text-gray-900 mb-4">
-          Preview Complete!
-        </h1>
+        <h1 className="text-2xl font-bold text-gray-900 mb-4">Preview Complete!</h1>
         <p className="text-gray-600 mb-6">
-          You have reached the end of the assessment preview for {job.title}.
-          No responses have been saved.
+          You have reached the end of the assessment preview for {job.title}. No responses have been saved.
         </p>
         <button
-          onClick={() => navigate("/dashboard/assessments")}
-          className="bg-emerald-600 cursor-pointer text-white px-4 py-2 rounded-lg hover:bg-emerald-700"
+          onClick={() => navigate("/assessments")}
+          className="bg-indigo-600 cursor-pointer text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
         >
           Back to Assessments
         </button>

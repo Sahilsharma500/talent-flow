@@ -163,7 +163,7 @@ const AssessmentBuilder = () => {
     try {
       await axios.post("/assessments", assessment);
       toast.success("Assessment saved successfully");
-      navigate("/dashboard/assessments");
+      navigate("/assessments");
     } catch (error) {
       console.error("Error saving assessment:", error);
     }
@@ -259,7 +259,7 @@ const AssessmentBuilder = () => {
           </h1>
           <button
             onClick={() => navigate("/dashboard/assessments")}
-            className="bg-emerald-600 cursor-pointer text-white px-4 py-2 rounded-lg hover:bg-emerald-700"
+            className="bg-indigo-600 cursor-pointer text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
           >
             Back
           </button>
@@ -289,7 +289,7 @@ const AssessmentBuilder = () => {
             </button>
             <button
               onClick={saveAssessment}
-              className="px-4 py-2 cursor-pointer bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+              className="px-4 py-2 cursor-pointer bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
             >
               <span className="md:text-sm text-xs">Save</span>
             </button>
@@ -305,7 +305,7 @@ const AssessmentBuilder = () => {
               onClick={() => setActiveTab("builder")}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === "builder"
-                  ? "border-emerald-500 text-emerald-600"
+                  ? "border-indigo-500 text-indigo-600"
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
               }`}
             >
@@ -315,7 +315,7 @@ const AssessmentBuilder = () => {
               onClick={() => setActiveTab("preview")}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === "preview"
-                  ? "border-emerald-500 text-emerald-600"
+                  ? "border-indigo-500 text-indigo-600"
                   : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
               }`}
             >
@@ -336,7 +336,7 @@ const AssessmentBuilder = () => {
                 </h2>
                 <button
                   onClick={addSection}
-                  className="bg-emerald-600 cursor-pointer text-white px-3 py-1 rounded text-sm hover:bg-emerald-700"
+                  className="bg-indigo-600 cursor-pointer text-white px-3 py-1 rounded text-sm hover:bg-indigo-700"
                 >
                   <span className="md:text-sm text-xs">Add Section</span>
                 </button>
@@ -348,7 +348,7 @@ const AssessmentBuilder = () => {
                     key={section.id}
                     className={`p-4 border rounded-lg cursor-pointer transition-colors ${
                       selectedSection === section.id
-                        ? "border-emerald-500 bg-emerald-50"
+                        ? "border-indigo-500 bg-indigo-50"
                         : "border-gray-200 hover:border-gray-300"
                     }`}
                     onClick={() => setSelectedSection(section.id)}
@@ -434,7 +434,7 @@ const AssessmentBuilder = () => {
                         key={question.id}
                         className={`p-4 border rounded-lg cursor-pointer transition-colors ${
                           selectedQuestion === question.id
-                            ? "border-emerald-500 bg-emerald-50"
+                            ? "border-indigo-500 bg-indigo-50"
                             : "border-gray-200 hover:border-gray-300"
                         }`}
                         onClick={() => setSelectedQuestion(question.id)}
@@ -551,7 +551,7 @@ const AssessmentBuilder = () => {
                                       { options: newOptions }
                                     );
                                   }}
-                                  className="text-emerald-600 hover:text-emerald-700 text-sm"
+                                  className="text-indigo-600 hover:text-indigo-700 text-sm"
                                 >
                                   + Add Option
                                 </button>
@@ -731,7 +731,7 @@ const AssessmentBuilder = () => {
                                         }
                                       }
                                     }}
-                                    className="text-emerald-600 hover:text-emerald-700 text-sm"
+                                    className="text-indigo-600 hover:text-indigo-700 text-sm"
                                   >
                                     Add Condition
                                   </button>
@@ -974,7 +974,7 @@ const AssessmentBuilder = () => {
                                   e.target.value
                                 )
                               }
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                               placeholder="Enter your answer..."
                             />
                           )}
@@ -989,7 +989,7 @@ const AssessmentBuilder = () => {
                                 )
                               }
                               rows={4}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                               placeholder="Enter your answer..."
                             />
                           )}
@@ -1006,7 +1006,7 @@ const AssessmentBuilder = () => {
                               }
                               min={question.validation?.min}
                               max={question.validation?.max}
-                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
                               placeholder="Enter a number..."
                             />
                           )}
@@ -1068,7 +1068,7 @@ const AssessmentBuilder = () => {
                     );
                     toast.success("Responses saved locally!");
                   }}
-                  className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+                  className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
                 >
                   Save
                 </button>
