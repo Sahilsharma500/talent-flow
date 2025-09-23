@@ -1,10 +1,12 @@
+// src/api/assessmentsHandlers.js
 import { http, HttpResponse } from 'msw';
 import {
   getAssessmentByJobId,
   saveAssessment,
   submitAssessmentResponse,
   getAllAssessments,
-  deleteAssessment
+  deleteAssessment,
+  getResponsesByAssessmentId
 } from '../db/assessmentsDB.js';
 import { delay, maybeFail } from '../../utils/latency';
 
@@ -26,10 +28,16 @@ export const assessmentsHandlers = [
     return HttpResponse.json(savedAssessment);
   }),
 
-  http.get('/assessments/:jobId', async ({ params }) => {
+  http.get('/assessments/:assessmentId', async ({ params }) => {
     await delay();
-    const assessment = await getAssessmentByJobId(params.jobId);
+    const assessment = await getAssessmentByJobId(params.assessmentId);
     return HttpResponse.json(assessment);
+  }),
+
+  http.get('/assessments/:assessmentId/responses', async ({ params }) => {
+    await delay();
+    const responses = await getResponsesByAssessmentId(params.assessmentId);
+    return HttpResponse.json({ data: responses });
   }),
 
   http.put('/assessments/:jobId', async ({ request }) => {
@@ -43,8 +51,8 @@ export const assessmentsHandlers = [
   http.post('/assessments/:jobId/submit', async ({ params, request }) => {
     await delay();
     maybeFail();
-    const responses = await request.json();
-    const result = await submitAssessmentResponse(params.jobId, responses);
+    const { candidateId, responses } = await request.json();
+    const result = await submitAssessmentResponse(params.jobId, candidateId, responses);
     return HttpResponse.json(result);
   }),
 

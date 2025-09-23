@@ -1,9 +1,10 @@
+// src/seed/assessmentsSeed.js
 import { faker } from '@faker-js/faker';
 
-faker.seed(12345); // consistent data across refreshes
+faker.seed(12345);
 
 function generateQuestion(sectionIndex, questionIndex) {
-  const types = ['single-choice', 'multi-choice', 'short-text', 'long-text', 'numeric'];
+  const types = ['single-choice', 'multi-choice', 'short-text', 'long-text', 'numeric', 'file-upload'];
   const type = faker.helpers.arrayElement(types);
 
   const baseQuestion = {
@@ -55,6 +56,24 @@ function generateAssessment(jobId) {
     })),
     createdAt: faker.date.past({ years: 1 })
   };
+}
+
+// Generate mock responses with scores for multiple candidates
+export function generateCandidateResponses(assessments, candidates) {
+  const responses = [];
+  assessments.forEach(assessment => {
+    faker.helpers.shuffle(candidates).slice(0, faker.number.int({ min: 5, max: 15 })).forEach(candidate => {
+      responses.push({
+        id: faker.string.uuid(),
+        assessmentId: assessment.id,
+        candidateId: candidate.id,
+        score: faker.number.int({ min: 20, max: 100 }),
+        responses: {}, // Mock responses, not used for this UI but good practice
+        submittedAt: faker.date.past({ days: 30 })
+      });
+    });
+  });
+  return responses;
 }
 
 const jobIds = ['job-1', 'job-2', 'job-3'];
