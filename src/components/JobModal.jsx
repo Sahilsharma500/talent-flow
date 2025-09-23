@@ -61,7 +61,7 @@ const JobModal = ({ job, onClose, onSave }) => {
             <h2 className="text-xl font-bold text-gray-900">
               {job ? "Edit Job" : "Create New Job"}
             </h2>
-            <button onClick={onClose} className="text-gray-400 cursor-pointer hover:text-emerald-500">
+            <button onClick={onClose} className="text-gray-400 cursor-pointer hover:text-indigo-500">
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -76,7 +76,7 @@ const JobModal = ({ job, onClose, onSave }) => {
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${errors.title ? "border-red-300" : "border-gray-300"}`}
+                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${errors.title ? "border-red-300" : "border-gray-300"}`}
                   placeholder="e.g., Senior React Developer"
                 />
                 {errors.title && <p className="text-red-500 text-xs mt-1">{errors.title}</p>}
@@ -88,7 +88,7 @@ const JobModal = ({ job, onClose, onSave }) => {
                   type="text"
                   value={formData.location}
                   onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   placeholder="e.g., San Francisco, CA"
                 />
               </div>
@@ -98,7 +98,7 @@ const JobModal = ({ job, onClose, onSave }) => {
                 <select
                   value={formData.jobType}
                   onChange={(e) => setFormData({ ...formData, jobType: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 >
                   <option value="Full-time">Full-time</option>
                   <option value="Part-time">Part-time</option>
@@ -113,7 +113,7 @@ const JobModal = ({ job, onClose, onSave }) => {
                   type="text"
                   value={formData.salary}
                   onChange={(e) => setFormData({ ...formData, salary: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                   placeholder="e.g., $80K - $120K"
                 />
               </div>
@@ -137,7 +137,7 @@ const JobModal = ({ job, onClose, onSave }) => {
                 value={formData.description}
                 onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                 rows={4}
-                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent ${errors.description ? "border-red-300" : "border-gray-300"}`}
+                className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${errors.description ? "border-red-300" : "border-gray-300"}`}
                 placeholder="Describe the role, responsibilities, and what makes this opportunity exciting..."
               />
               {errors.description && <p className="text-red-500 text-xs mt-1">{errors.description}</p>}
@@ -149,7 +149,7 @@ const JobModal = ({ job, onClose, onSave }) => {
                 value={formData.requirements}
                 onChange={(e) => setFormData({ ...formData, requirements: e.target.value })}
                 rows={4}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
                 placeholder="3+ years of React experience&#10;Strong TypeScript skills&#10;Experience with testing frameworks"
               />
             </div>
@@ -176,7 +176,7 @@ const JobModal = ({ job, onClose, onSave }) => {
               <button
                 type="submit"
                 disabled={loading}
-                className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 transition-colors duration-200"
+                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 transition-colors duration-200"
               >
                 {loading ? "Saving..." : job ? "Update Job" : "Create Job"}
               </button>

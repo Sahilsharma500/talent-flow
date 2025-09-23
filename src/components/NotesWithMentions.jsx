@@ -8,13 +8,10 @@ const NotesWithMentions = ({ value, onChange, placeholder = "Add a note...", row
   const textareaRef = useRef(null);
   const suggestionRef = useRef(null);
 
-  // Mock users for mentions
+  // Updated mock users for mentions
   const mentionUsers = [
-    { id: "1", name: "John Smith", email: "john@company.com" },
-    { id: "2", name: "Sarah Johnson", email: "sarah@company.com" },
-    { id: "3", name: "Mike Wilson", email: "mike@company.com" },
-    { id: "4", name: "Emily Davis", email: "emily@company.com" },
-    { id: "5", name: "David Brown", email: "david@company.com" },
+    { id: "1", name: "Candidate", email: "Reference the current applicant" },
+    { id: "2", name: "HR_Team", email: "Mention the HR team" },
   ];
 
   const handleTextChange = (e) => {
@@ -119,13 +116,18 @@ const NotesWithMentions = ({ value, onChange, placeholder = "Add a note...", row
 
     return parts.map((part, index) => {
       if (part.startsWith("@")) {
-        const userName = part.substring(1);
-        const user = mentionUsers.find((u) => u.name === userName);
+        const mentionName = part.substring(1);
+        const user = mentionUsers.find((u) => u.name === mentionName);
+        
         if (user) {
+          const colorClass = user.name === "Candidate" 
+            ? "bg-purple-100 text-purple-800" 
+            : "bg-blue-100 text-blue-800";
+            
           return (
             <span
               key={index}
-              className="bg-blue-100 text-blue-800 px-1 rounded text-sm font-medium"
+              className={`px-1 rounded text-sm font-medium ${colorClass}`}
             >
               {part}
             </span>
@@ -145,7 +147,7 @@ const NotesWithMentions = ({ value, onChange, placeholder = "Add a note...", row
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
         rows={rows}
-        className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 ${className}`}
+        className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 ${className}`}
       />
 
       {showSuggestions && suggestions.length > 0 && (
@@ -159,7 +161,7 @@ const NotesWithMentions = ({ value, onChange, placeholder = "Add a note...", row
               onClick={() => handleSuggestionClick(user)}
               className={`px-3 py-2 cursor-pointer text-sm ${
                 index === selectedSuggestion
-                  ? "bg-emerald-50 text-emerald-700"
+                  ? "bg-emerald-50 text-indigo-700"
                   : "hover:bg-gray-50"
               }`}
             >

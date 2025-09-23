@@ -26,7 +26,7 @@ const CandidatesByJob = () => {
     { id: "interview", name: "Interview", color: "bg-purple-100 text-purple-800" },
     { id: "offer", name: "Offer", color: "bg-green-100 text-green-800" },
     { id: "rejected", name: "Rejected", color: "bg-red-100 text-red-800" },
-    { id: "hired", name: "Hired", color: "bg-emerald-100 text-emerald-800" },
+    { id: "hired", name: "Hired", color: "bg-indigo-100 text-indigo-800" }, // changed
   ];
 
   const fetchCandidates = async () => {
@@ -156,7 +156,6 @@ const CandidatesByJob = () => {
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* skeleton */}
         <div className="animate-pulse">
           <div className="h-8 bg-gray-200 rounded w-48 mb-8"></div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-6">
@@ -181,8 +180,8 @@ const CandidatesByJob = () => {
       <div className="mb-8">
         <div className="flex justify-between items-center">
           <div>
-            <h1 className="text-3xl text-emerald-600 font-bold mb-2">Candidates</h1>
-            <p className="text-emerald-600/90">
+            <h1 className="text-3xl text-indigo-600 font-bold mb-2">Candidates</h1>
+            <p className="text-indigo-600/90">
               {jobFilter
                 ? `Applications for ${getJobTitle(jobFilter)}`
                 : "Manage candidate applications"}
@@ -191,13 +190,13 @@ const CandidatesByJob = () => {
           <div className="flex items-center space-x-4">
             {jobFilter && (
               <button
-                onClick={() => navigate("/dashboard/candidates")}
+                onClick={() => navigate("/candidates")}
                 className="text-gray-600 hover:text-gray-900 text-sm font-medium cursor-pointer"
               >
                 View All Applications
               </button>
             )}
-            <div className="text-sm text-emerald-600 font-bold">
+            <div className="text-sm text-indigo-600 font-bold">
               Total: {candidates.length} candidates
             </div>
           </div>
@@ -206,7 +205,7 @@ const CandidatesByJob = () => {
 
       {/* Search & Filter */}
       <div className="mb-6">
-        <div className="bg-white rounded-lg shadow-sm border border-emerald-400 p-4">
+        <div className="bg-white rounded-lg shadow-sm border border-indigo-400 p-4">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -217,7 +216,7 @@ const CandidatesByJob = () => {
                 placeholder="Search by name or email..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
               />
             </div>
             <div>
@@ -227,7 +226,7 @@ const CandidatesByJob = () => {
               <select
                 value={stageFilter}
                 onChange={(e) => setStageFilter(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
               >
                 <option value="">All Stages</option>
                 {stages.map((stage) => (
@@ -259,7 +258,7 @@ const CandidatesByJob = () => {
           return (
             <div
               key={stage.id}
-              className="bg-gray-50 border border-emerald-400 rounded-lg p-3 min-h-[600px] flex flex-col"
+              className="bg-gray-50 border border-indigo-400 rounded-lg p-3 min-h-[600px] flex flex-col"
               onDragOver={handleDragOver}
               onDrop={(e) => handleDrop(e, stage.id)}
             >
@@ -337,14 +336,14 @@ const CandidatesByJob = () => {
                     <div className="flex items-center justify-between pt-2 border-t border-gray-100">
                       <button
                         onClick={() => navigate(`/candidates/${candidate.id}`)}
-                        className="cursor-pointer border border-emerald-500 text-xs text-emerald-600 hover:text-emerald-700 font-medium px-2 py-1 rounded hover:bg-emerald-50"
+                        className="cursor-pointer border border-indigo-500 text-xs text-indigo-600 hover:text-indigo-700 font-medium px-2 py-1 rounded hover:bg-indigo-50"
                       >
                         View
                       </button>
                       <div className="flex items-center space-x-2">
                         <button
                           onClick={() => handleAddNote(candidate)}
-                          className="cursor-pointer text-xs text-emerald-600 hover:text-emerald-700 p-1 rounded hover:bg-gray-100"
+                          className="cursor-pointer text-xs text-indigo-600 hover:text-indigo-700 p-1 rounded hover:bg-gray-100"
                           title="Add Notes"
                         >
                           {/* pencil icon */}
@@ -388,8 +387,8 @@ const CandidatesByJob = () => {
       </div>
 
       {showNotesModal && selectedCandidate && (
-        <div className="fixed inset-0 bg-emerald-50 bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white border border-emerald-400 rounded-lg p-6 w-full max-w-md mx-4">
+        <div className="fixed inset-0 bg-indigo-50 bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white border border-indigo-400 rounded-lg p-6 w-full max-w-md mx-4">
             <h3 className="text-lg font-medium text-gray-900 mb-4">
               Add Note for {selectedCandidate.name}
             </h3>
@@ -412,7 +411,7 @@ const CandidatesByJob = () => {
               </button>
               <button
                 onClick={handleSaveNote}
-                className="px-4 py-2 cursor-pointer bg-emerald-600 text-white rounded-lg hover:bg-emerald-700"
+                className="px-4 py-2 cursor-pointer bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
               >
                 Save Note
               </button>

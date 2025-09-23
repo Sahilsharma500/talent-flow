@@ -11,7 +11,6 @@ const Header = () => {
   const toggleProfile = () => setIsProfileOpen(!isProfileOpen);
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
-  // Close profile dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (profileRef.current && !profileRef.current.contains(event.target)) {
@@ -23,12 +22,12 @@ const Header = () => {
   }, []);
 
   const navItems = [
-  { name: "Home", path: "/" },
-  { name: "Jobs", path: "/jobs" },
-  { name: "Candidates", path: "/candidates" },
-  { name: "Assessments", path: "/assessments" }, 
-  { name: "Dashboard", path: "/dashboard" },
-];
+    { name: "Home", path: "/" },
+    { name: "Jobs", path: "/jobs" },
+    { name: "Candidates", path: "/candidates" },
+    { name: "Assessments", path: "/assessments" },
+    { name: "Dashboard", path: "/dashboard" },
+  ];
 
   return (
     <header className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
@@ -45,7 +44,7 @@ const Header = () => {
               <button
                 key={item.name}
                 onClick={() => navigate(item.path)}
-                className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200"
+                className="text-gray-700 hover:text-indigo-600 font-medium transition-colors duration-200"
               >
                 {item.name}
               </button>
@@ -57,7 +56,7 @@ const Header = () => {
             <div className="md:hidden">
               <button
                 onClick={toggleMobileMenu}
-                className="text-gray-700 hover:text-blue-600 focus:outline-none"
+                className="text-gray-700 hover:text-indigo-600 focus:outline-none"
               >
                 <svg
                   className="w-6 h-6"
@@ -81,7 +80,7 @@ const Header = () => {
 
             {/* Notification & Chat */}
             <div className="hidden sm:flex items-center space-x-4">
-              <button className="cursor-pointer text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
+              <button className="cursor-pointer text-gray-700 hover:text-indigo-600 font-medium transition-colors duration-200">
                 <svg
                   className="w-6 h-6"
                   fill="none"
@@ -97,7 +96,7 @@ const Header = () => {
                 </svg>
               </button>
 
-              <button className="cursor-pointer text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200">
+              <button className="cursor-pointer text-gray-700 hover:text-indigo-600 font-medium transition-colors duration-200">
                 <svg
                   className="w-6 h-6"
                   fill="none"
@@ -118,11 +117,11 @@ const Header = () => {
             <div className="relative" ref={profileRef}>
               <button
                 onClick={toggleProfile}
-                className="cursor-pointer flex items-center space-x-3 text-gray-700 hover:text-blue-600 transition-colors duration-200 p-2 rounded-lg hover:bg-gray-50"
+                className="cursor-pointer flex items-center space-x-3 text-gray-700 hover:text-indigo-600 transition-colors duration-200 p-2 rounded-lg hover:bg-gray-50"
               >
-                <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
                   <svg
-                    className="w-5 h-5 text-blue-600"
+                    className="w-5 h-5 text-indigo-600"
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"
@@ -147,7 +146,12 @@ const Header = () => {
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
                 </svg>
               </button>
 
@@ -155,9 +159,9 @@ const Header = () => {
                 <div className="cursor-pointer absolute right-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
                   <div className="px-4 py-3 border-b border-gray-100">
                     <div className="flex items-center space-x-3">
-                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                      <div className="w-10 h-10 bg-indigo-100 rounded-full flex items-center justify-center">
                         <svg
-                          className="w-6 h-6 text-blue-600"
+                          className="w-6 h-6 text-indigo-600"
                           fill="none"
                           stroke="currentColor"
                           viewBox="0 0 24 24"
@@ -171,9 +175,11 @@ const Header = () => {
                         </svg>
                       </div>
                       <div>
-                        <p className="text-sm font-medium text-gray-900">Sahil</p>
+                        <p className="text-sm font-medium text-gray-900">
+                          Sahil
+                        </p>
                         <p className="text-xs text-gray-500">hr@company.com</p>
-                        <p className="text-xs text-blue-600 font-medium">
+                        <p className="text-xs text-indigo-600 font-medium">
                           HR Administrator
                         </p>
                       </div>
@@ -204,7 +210,7 @@ const Header = () => {
           <Logo />
           <button
             onClick={toggleMobileMenu}
-            className="text-gray-700 hover:text-blue-600"
+            className="text-gray-700 hover:text-indigo-600"
           >
             ✕
           </button>
@@ -217,7 +223,7 @@ const Header = () => {
                 navigate(item.path);
                 setIsMobileMenuOpen(false);
               }}
-              className="text-gray-700 hover:text-blue-600 font-medium text-lg text-left transition-colors duration-200"
+              className="text-gray-700 hover:text-indigo-600 font-medium text-lg text-left transition-colors duration-200"
             >
               {item.name}
             </button>
