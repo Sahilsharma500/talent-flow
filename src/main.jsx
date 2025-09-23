@@ -7,6 +7,7 @@ import { initializeJobs } from "./api/db/jobsDB.js";
 import { initializeCandidates } from "./api/db/candidateDB.js";
 import { initializeAssessments } from "./api/db/assessmentsDB.js";
 import { Toaster } from "react-hot-toast";
+import { initializeAnalytics } from "./api/db/analyticsDB.js";
 
 const startApp = () => {
   const rootElement = document.getElementById("root");
@@ -35,6 +36,7 @@ if (process.env.NODE_ENV === "development") {
           initializeCandidates();
           initializeAssessments();
           startApp();
+          initializeAnalytics();
         })
         .catch((error) => console.error("MSW failed to start:", error));
     })
