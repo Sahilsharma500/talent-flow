@@ -1,11 +1,10 @@
-// src/db/candidatesDB.js
 import Dexie from 'dexie';
 import { candidatesSeed } from '../seed/candidateSeed';
 
 // create database
 export const candidatesDb = new Dexie('CandidatesDB');
-candidatesDb.version(1).stores({
-  candidates: '&id, email, stage, jobId, name, appliedAt, updatedAt'
+candidatesDb.version(3).stores({ // Version incremented to 3
+  candidates: '&id, email, stage, jobId, name, appliedAt, updatedAt, previousCompany, previousRole, yearsOfExperience, dateOfBirth, profilePicture' // profilePicture added
 });
 
 // dev helpers
@@ -31,7 +30,6 @@ export async function initializeCandidates() {
     catch(error){
         console.log(`error in candidate db ${error}`);
     }
-  
 }
 
 // queries
@@ -46,7 +44,9 @@ export async function getAllCandidates(params = {}) {
       query = query.filter(
         c =>
           c.name.toLowerCase().includes(term) ||
-          c.email.toLowerCase().includes(term)
+          c.email.toLowerCase().includes(term) ||
+          c.previousCompany?.toLowerCase().includes(term) ||
+          c.previousRole?.toLowerCase().includes(term)
       );
     }
 

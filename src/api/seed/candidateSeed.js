@@ -1,13 +1,14 @@
 import { faker } from '@faker-js/faker';
 
-faker.seed(12345); 
+faker.seed(12345);
 
 const stages = ['applied', 'screening', 'interview', 'offer', 'hired', 'rejected'];
 
 function generateCandidate(index, jobIds) {
   const firstName = faker.person.firstName();
   const lastName = faker.person.lastName();
-
+  const yearsOfExperience = faker.number.int({ min: 1, max: 15 });
+  const dateOfBirth = faker.date.birthdate({ min: 18, max: 65, mode: 'age' });
   const techSkills = [
     'React', 'Vue', 'Angular', 'Node.js', 'Python', 'Java',
     'TypeScript', 'JavaScript', 'AWS', 'Docker', 'Kubernetes',
@@ -17,7 +18,7 @@ function generateCandidate(index, jobIds) {
   ];
 
   const skills = faker.helpers.arrayElements(techSkills, { min: 2, max: 6 });
-  const experience = `Experienced developer with ${faker.number.int({ min: 1, max: 8 })} years of experience in software development. Proficient in ${skills.slice(0, 3).join(', ')}. Strong background in building scalable applications and working in agile environments.`;
+  const experience = `Experienced developer with ${yearsOfExperience} years of experience in software development. Proficient in ${skills.slice(0, 3).join(', ')}. Strong background in building scalable applications and working in agile environments.`;
 
   const coverLetter = `Dear Hiring Manager,
 
@@ -34,10 +35,15 @@ ${firstName} ${lastName}`;
     id: `candidate-${index + 1}`,
     name: `${firstName} ${lastName}`,
     email: faker.internet.email({ firstName, lastName }),
+    profilePicture: faker.image.avatar(), // Added profile picture
     stage: faker.helpers.arrayElement(stages),
     jobId: faker.helpers.arrayElement(jobIds),
     phone: faker.phone.number(),
     resume: faker.internet.url(),
+    dateOfBirth,
+    previousCompany: faker.company.name(),
+    previousRole: faker.person.jobTitle(),
+    yearsOfExperience,
     notes: Array.from(
       { length: faker.number.int({ min: 0, max: 3 }) },
       () => faker.lorem.sentence()
