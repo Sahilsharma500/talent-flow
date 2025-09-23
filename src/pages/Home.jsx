@@ -1,11 +1,12 @@
 import React from "react";
-// import heroImage from "../assets/hero-image.svg"; // optional: replace with your image
+import { useNavigate } from "react-router-dom";
 
 const HomePage = () => {
+  const navigate = useNavigate();
   return (
     <div className="w-full">
       {/* Hero Section */}
-      <section className="bg-gradient-to-r from-blue-400 to-blue-600 text-white">
+      <section className="bg-gradient-to-r from-indigo-400 to-indigo-600 text-white">
         <div className="container mx-auto px-6 py-20 flex flex-col-reverse md:flex-row items-center md:justify-between">
           <div className="md:w-1/2 text-center md:text-left">
             <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
@@ -16,14 +17,21 @@ const HomePage = () => {
               recruitment and find the right talent faster.
             </p>
             <div className="flex justify-center md:justify-start gap-4">
-              <button className="bg-white text-blue-600 font-semibold px-6 py-3 rounded-lg hover:bg-gray-100 transition">
+              <button
+                onClick={() => navigate("/jobs")}
+                className="bg-white text-indigo-600 font-semibold px-6 py-3 rounded-lg hover:bg-gray-100 transition"
+              >
                 View Jobs
               </button>
-              <button className="bg-blue-800 text-white font-semibold px-6 py-3 rounded-lg hover:bg-blue-900 transition">
-                Post a Job
+              <button
+                onClick={() => navigate("/candidates")}
+                className="bg-indigo-800 text-white font-semibold px-6 py-3 rounded-lg hover:bg-indigo-900 transition"
+              >
+                View Candidates
               </button>
             </div>
           </div>
+          {/* optional hero image */}
           {/* <div className="md:w-1/2 mb-10 md:mb-0 flex justify-center">
             <img
               src={heroImage}
@@ -49,8 +57,8 @@ const HomePage = () => {
 
         {/* Features */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-blue-50 p-6 rounded-lg text-center hover:shadow-lg transition">
-            <div className="text-blue-600 mb-4 text-4xl">📄</div>
+          <div className="bg-indigo-50 p-6 rounded-lg text-center hover:shadow-lg transition">
+            <div className="text-indigo-600 mb-4 text-4xl">📄</div>
             <h3 className="font-semibold text-xl mb-2">Job Management</h3>
             <p className="text-gray-600">
               Post and manage jobs effortlessly, keep track of openings and
@@ -58,34 +66,34 @@ const HomePage = () => {
             </p>
           </div>
 
-          <div className="bg-blue-50 p-6 rounded-lg text-center hover:shadow-lg transition">
-            <div className="text-blue-600 mb-4 text-4xl">👥</div>
+          <div className="bg-indigo-50 p-6 rounded-lg text-center hover:shadow-lg transition">
+            <div className="text-indigo-600 mb-4 text-4xl">👥</div>
             <h3 className="font-semibold text-xl mb-2">Candidate Tracking</h3>
             <p className="text-gray-600">
               Track applications and candidate progress in a visual pipeline.
             </p>
           </div>
 
-          <div className="bg-blue-50 p-6 rounded-lg text-center hover:shadow-lg transition">
-            <div className="text-blue-600 mb-4 text-4xl">📊</div>
+          <div className="bg-indigo-50 p-6 rounded-lg text-center hover:shadow-lg transition">
+            <div className="text-indigo-600 mb-4 text-4xl">📊</div>
             <h3 className="font-semibold text-xl mb-2">Analytics</h3>
             <p className="text-gray-600">
-              Make informed decisions with insights into applications and
-              hiring trends.
+              Make informed decisions with insights into applications and hiring
+              trends.
             </p>
           </div>
         </div>
       </section>
 
       {/* Optional Call-to-Action Section */}
-      <section className="bg-blue-100 py-16 text-center">
+      <section className="bg-indigo-100 py-16 text-center">
         <h2 className="text-2xl sm:text-3xl font-bold mb-4 text-gray-800">
           Ready to streamline your recruitment?
         </h2>
         <p className="mb-6 text-gray-600">
           Join TalentFlow today and take your hiring process to the next level.
         </p>
-        <button className="bg-blue-600 text-white font-semibold px-8 py-3 rounded-lg hover:bg-blue-700 transition">
+        <button className="bg-indigo-600 text-white font-semibold px-8 py-3 rounded-lg hover:bg-indigo-700 transition">
           Get Started
         </button>
       </section>

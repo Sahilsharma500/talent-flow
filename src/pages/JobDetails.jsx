@@ -31,9 +31,9 @@ const JobDetails = () => {
     }
   }, [id, navigate]);
 
-    const handleManage = () => {
-        navigate(`/jobs/${id}/candidates`);
-    }
+  const handleManage = () => {
+    navigate(`/jobs/${id}/candidates`);
+  };
 
 //   const handleApplicationSuccess = () => {
 //     toast.success(`Application submitted successfully for ${job?.title}!`);
@@ -73,7 +73,7 @@ const JobDetails = () => {
             </p>
             <Button
               variant="default"
-              className="bg-emerald-600 hover:bg-emerald-700 text-white"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white"
               onClick={() => navigate("/jobs")}
             >
               Browse All Jobs
@@ -87,13 +87,13 @@ const JobDetails = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b">
+      {/* <div className="bg-white shadow-sm border-b">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex justify-between items-center">
             <Button
               variant="outline"
               onClick={() => navigate("/jobs")}
-              className="flex items-center space-x-2 hover:bg-gray-100 hover:text-emerald-600"
+              className="flex items-center space-x-2 hover:bg-gray-100 hover:text-indigo-600"
             >
               <svg
                 className="w-4 h-4"
@@ -112,7 +112,7 @@ const JobDetails = () => {
             </Button>
           </div>
         </div>
-      </div>
+      </div> */}
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
@@ -180,7 +180,7 @@ const JobDetails = () => {
                   </span>
                 </div>
                 <div className="flex flex-wrap gap-2">
-                  <span className="px-3 py-1 bg-emerald-100 text-emerald-800 text-sm font-medium rounded-full">
+                  <span className="px-3 py-1 bg-indigo-100 text-indigo-800 text-sm font-medium rounded-full">
                     {job.jobType || "Job"}
                   </span>
                   {job.tags.map((tag) => (
@@ -198,7 +198,7 @@ const JobDetails = () => {
                   variant="default"
                   size="lg"
                   onClick={handleManage}
-                  className="w-full bg-emerald-600 hover:bg-emerald-700"
+                  className="w-full bg-indigo-400 hover:bg-indigo-500"
                 >
                   Manage Candidates
                 </Button>
@@ -212,7 +212,7 @@ const JobDetails = () => {
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">
                 Job Description
               </h2>
-                            <p className="text-gray-700 whitespace-pre-line">
+              <p className="text-gray-700 whitespace-pre-line">
                 {job.description}
               </p>
 
@@ -263,4 +263,3 @@ const JobDetails = () => {
 };
 
 export default JobDetails;
-

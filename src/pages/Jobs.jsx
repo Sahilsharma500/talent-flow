@@ -20,18 +20,13 @@ const Jobs = () => {
   const [draggedJob, setDraggedJob] = useState(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [jobToDelete, setJobToDelete] = useState(null);
-  const [jobDropdown, setJobDropdown] = useState(null); // Tracks which job dropdown is open
+  const [jobDropdown, setJobDropdown] = useState(null);
 
   const fetchJobs = async () => {
     try {
       setLoading(true);
       const response = await axios.get("/jobs", {
-        params: {
-          search,
-          status: statusFilter,
-          page: currentPage,
-          pageSize,
-        },
+        params: { search, status: statusFilter, page: currentPage, pageSize },
       });
       setJobs(response.data.data);
       setTotalJobs(response.data.total);
@@ -91,9 +86,8 @@ const Jobs = () => {
     }
   };
 
-  const getApplicationsForJob = (jobId) => {
-    return candidates.filter((candidate) => candidate.jobId === jobId);
-  };
+  const getApplicationsForJob = (jobId) =>
+    candidates.filter((candidate) => candidate.jobId === jobId);
 
   const handleReorder = async (fromIndex, toIndex) => {
     const newJobs = [...jobs];
@@ -155,15 +149,16 @@ const Jobs = () => {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Header */}
       <div className="mb-8 flex sm:flex-row flex-col sm:gap-0 gap-2 justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-emerald-600 mb-2">Jobs</h1>
-          <p className="text-emerald-600/90">Create and manage your job postings</p>
+          <h1 className="text-3xl font-bold text-indigo-600 mb-2">Jobs</h1>
+          <p className="text-indigo-600/100">Create and manage your job postings</p>
         </div>
         <div className="flex items-center space-x-3">
-          <button
+          {/* <button
             onClick={() => navigate("/dashboard/candidates")}
-            className="bg-blue-600 cursor-pointer text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center space-x-2"
+            className="bg-indigo-600 cursor-pointer text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors duration-200 flex items-center space-x-2"
           >
             <svg
               className="w-5 h-5"
@@ -179,10 +174,10 @@ const Jobs = () => {
               />
             </svg>
             <span className="md:text-sm text-xs">View Candidates</span>
-          </button>
+          </button> */}
           <button
             onClick={() => setShowCreateModal(true)}
-            className="bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition-colors duration-200 flex items-center space-x-2"
+            className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors duration-200 flex items-center space-x-2"
           >
             <svg
               className="w-5 h-5"
@@ -205,12 +200,12 @@ const Jobs = () => {
             placeholder="Search jobs by title or tags..."
             value={search}
             onChange={(e) => handleSearch(e.target.value)}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
           />
           <select
             value={statusFilter}
             onChange={(e) => handleStatusFilter(e.target.value)}
-            className="sm:w-48 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-emerald-500 focus:border-transparent"
+            className="sm:w-48 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
           >
             <option value="">All Status</option>
             <option value="active">Active</option>
@@ -249,16 +244,17 @@ const Jobs = () => {
               <div
                 key={job.id}
                 draggable
+                onClick={() => navigate(`/jobs/${job.id}`)}
                 onDragStart={(e) => handleDragStart(e, job)}
                 onDragOver={handleDragOver}
                 onDrop={(e) => handleDrop(e, index)}
                 className={`p-6 mb-4 bg-white rounded-lg shadow-sm 
-            hover:bg-gray-50 
-            hover:shadow-md 
-            hover:scale-[1.01] 
-            transition-all duration-200 ease-in-out cursor-move ${
-  draggedJob?.id === job.id ? "opacity-50" : ""
-}`}
+                  hover:bg-indigo-50 
+                  hover:shadow-md 
+                  hover:scale-[1.01] 
+                  transition-all duration-200 ease-in-out cursor-pointer ${
+                    draggedJob?.id === job.id ? "opacity-50" : ""
+                  }`}
               >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-3">
@@ -273,7 +269,7 @@ const Jobs = () => {
                         <span
                           className={`px-2 py-1 text-xs font-medium rounded-full ${
                             job.status === "active"
-                              ? "bg-emerald-100 text-emerald-800"
+                              ? "bg-indigo-100 text-indigo-800"
                               : "bg-gray-100 text-gray-800"
                           }`}
                         >
@@ -311,9 +307,10 @@ const Jobs = () => {
                   {/* Settings dropdown */}
                   <div className="relative ml-4">
                     <button
-                      onClick={() =>
-                        setJobDropdown((prev) => (prev === job.id ? null : job.id))
-                      }
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setJobDropdown((prev) => (prev === job.id ? null : job.id));
+                      }}
                       className="px-3 py-1 bg-gray-100 rounded-md hover:bg-gray-200 text-sm font-medium flex items-center"
                     >
                       Settings
@@ -335,25 +332,35 @@ const Jobs = () => {
                     {jobDropdown === job.id && (
                       <div className="absolute right-0 mt-2 w-40 bg-white border border-gray-200 rounded-md shadow-lg z-10">
                         <button
-                          onClick={() => navigate(`/jobs/${job.id}`)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(`/jobs/${job.id}`);
+                          }}
                           className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         >
                           View
                         </button>
                         <button
-                          onClick={() => setEditingJob(job)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setEditingJob(job);
+                          }}
                           className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         >
                           Edit
                         </button>
                         <button
-                          onClick={() => handleArchive(job)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleArchive(job);
+                          }}
                           className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         >
                           {job.status === "active" ? "Archive" : "Unarchive"}
                         </button>
                         <button
-                          onClick={() => {
+                          onClick={(e) => {
+                            e.stopPropagation();
                             setShowDeleteModal(true);
                             setJobToDelete(job);
                           }}
@@ -392,7 +399,7 @@ const Jobs = () => {
                   onClick={() => setCurrentPage(i + 1)}
                   className={`px-3 py-1 text-sm border rounded-md ${
                     currentPage === i + 1
-                      ? "bg-emerald-600 text-white border-emerald-600"
+                      ? "bg-indigo-600 text-white border-indigo-600"
                       : "border-gray-300 hover:bg-gray-50"
                   }`}
                 >
@@ -411,29 +418,25 @@ const Jobs = () => {
         </div>
       )}
 
-      {/* Create/Edit Job Modal */}
-      {(showCreateModal || editingJob) && (
+      {/* Modals */}
+      {showCreateModal && (
         <JobModal
-          job={editingJob}
-          onClose={() => {
-            setShowCreateModal(false);
-            setEditingJob(null);
-          }}
-          onSave={() => {
-            fetchJobs();
-            setShowCreateModal(false);
-            setEditingJob(null);
-          }}
+          onClose={() => setShowCreateModal(false)}
+          onJobCreated={fetchJobs}
         />
       )}
-
-      {/* Delete Job Modal */}
+      {editingJob && (
+        <JobModal
+          job={editingJob}
+          onClose={() => setEditingJob(null)}
+          onJobUpdated={fetchJobs}
+        />
+      )}
       {showDeleteModal && jobToDelete && (
         <DeleteConfirmationModal
-          isOpen={showDeleteModal}
           onClose={() => setShowDeleteModal(false)}
           onConfirm={() => handleDelete(jobToDelete.id)}
-          jobTitle={jobToDelete.title}
+          message={`Are you sure you want to delete job "${jobToDelete.title}"? This action cannot be undone.`}
         />
       )}
     </div>
