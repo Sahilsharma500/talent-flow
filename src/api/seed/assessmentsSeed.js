@@ -68,7 +68,7 @@ export function generateCandidateResponses(assessments, candidates) {
         assessmentId: assessment.id,
         candidateId: candidate.id,
         score: faker.number.int({ min: 20, max: 100 }),
-        responses: {}, // Mock responses, not used for this UI but good practice
+        responses: {}, 
         submittedAt: faker.date.past({ days: 30 })
       });
     });

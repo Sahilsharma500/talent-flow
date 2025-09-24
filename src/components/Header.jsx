@@ -8,18 +8,18 @@ const Header = () => {
   const navigate = useNavigate();
   const profileRef = useRef(null);
 
-  const toggleProfile = () => setIsProfileOpen(!isProfileOpen);
+  // const toggleProfile = () => setIsProfileOpen(!isProfileOpen);
   const toggleMobileMenu = () => setIsMobileMenuOpen(!isMobileMenuOpen);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (profileRef.current && !profileRef.current.contains(event.target)) {
-        setIsProfileOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  // useEffect(() => {
+  //   // const handleClickOutside = (event) => {
+  //   //   if (profileRef.current && !profileRef.current.contains(event.target)) {
+  //   //     setIsProfileOpen(false);
+  //   //   }
+  //   // };
+  //   // document.addEventListener("mousedown", handleClickOutside);
+  //   // return () => document.removeEventListener("mousedown", handleClickOutside);
+  // }, []);
 
   const navItems = [
     { name: "Home", path: "/" },
@@ -81,7 +81,7 @@ const Header = () => {
             {/* HR Profile */}
             <div className="relative" ref={profileRef}>
               <button
-                onClick={toggleProfile}
+                // onClick={toggleProfile}
                 className="cursor-pointer flex items-center space-x-3 text-gray-700 hover:text-indigo-600 transition-colors duration-200 p-2 rounded-lg hover:bg-gray-50"
               >
                 <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
