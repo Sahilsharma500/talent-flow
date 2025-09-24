@@ -56,7 +56,6 @@ const Jobs = () => {
       setJobs(responseData.data);
       setTotalJobs(responseData.total);
     } catch (error) {
-      // Error already logged in safelyFetchData, but good to catch here too
       setJobs([]);
       setTotalJobs(0);
     } finally {
@@ -69,20 +68,9 @@ const Jobs = () => {
       const responseData = await safelyFetchData("/candidates");
       setCandidates(responseData.data || []);
     } catch (error) {
-      // Error already logged in safelyFetchData
       setCandidates([]);
     }
   };
-  
-  // Note: location.pathname is not imported in this file, suggesting a possible bug in the original code. 
-  // I've commented out the original and kept the essential fetch logic below.
-  /*
-    useEffect(() => {
-      if (location.pathname === "/jobs") {
-        fetchCandidates();
-      }
-    }, [location.pathname]);
-  */
 
   useEffect(() => {
     fetchJobs();

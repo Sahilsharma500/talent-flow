@@ -90,19 +90,14 @@ const CandidateById = () => {
 
     const currentStage = candidate.stage;
 
-    // --- NEW VALIDATION LOGIC ---
     if (newStage !== "rejected") {
         const currentOrder = getStageOrder(currentStage);
         const targetOrder = getStageOrder(newStage);
-
-        // If trying to move backward or to an invalid stage
         if (targetOrder === -1 || targetOrder < currentOrder) {
-            // Prevent the update and show an error message
             toast.error("Cannot move candidate backward in the hiring process.");
             return; 
         }
     }
-    // ----------------------------
     
     try {
       await axios.patch(`/applications/${candidate.id}/status`, {

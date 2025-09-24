@@ -18,23 +18,17 @@ const Assessments = () => {
     try {
       setLoading(true);
 
-      // --- START FIX: Resilient fetching for multiple endpoints ---
-
       const fetchJson = async (url) => {
         const response = await axios.get(url);
         
-        // Check if the response is valid JSON (MSW should set Content-Type: application/json)
         const contentType = response.headers['content-type'];
 
         if (response.status >= 200 && response.status < 300 && contentType && contentType.includes('application/json')) {
           return response.data;
         } else if (response.status >= 200 && response.status < 300) {
-            // Handle success but non-JSON (e.g., HTML fallback due to dead worker)
             console.warn(`MSW worker might be asleep. Failed to parse JSON from ${url}.`);
-            // This error will be caught by the outer try/catch
             throw new Error(`Non-JSON response received from ${url}`); 
         } else {
-            // Handle actual HTTP error statuses
             throw new Error(`HTTP error ${response.status} from ${url}`);
         }
       };
@@ -47,14 +41,10 @@ const Assessments = () => {
       
       setAssessments(assessmentsData.data || []);
       setJobs(jobsData.data || []);
-
-      // --- END FIX: Resilient fetching for multiple endpoints ---
-
     } catch (error) {
-      // The catch block handles both network errors and the explicit throw from fetchJson
       toast.error('Error fetching data. Try refreshing the page.');
       console.error("Error fetching data:", error.message);
-      setAssessments([]); // Ensure UI gracefully shows empty state
+      setAssessments([]);
       setJobs([]);
     } finally {
       setLoading(false);

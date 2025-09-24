@@ -20,20 +20,16 @@ const AssessmentBuilder = () => {
     setLoading(true);
 
     try {
-      // 1️⃣ Fetch job
       let fetchedJob = job;
       if (!job) {
         const jobResponse = await axios.get(`/jobs/${jobId}`);
         fetchedJob = jobResponse.data;
         setJob(fetchedJob);
       }
-
-      // 2️⃣ Fetch assessment from localStorage
       const savedAssessment = localStorage.getItem(`builder-${jobId}`);
       if (savedAssessment) {
         setAssessment(JSON.parse(savedAssessment));
       } else {
-        // 3️⃣ Fetch from API if not in localStorage
         const assessmentResponse = await axios
           .get(`/assessments/${jobId}`)
           .catch(() => ({ data: { data: null } }));
@@ -43,7 +39,6 @@ const AssessmentBuilder = () => {
         if (fetchedAssessment) {
           setAssessment(fetchedAssessment);
         } else {
-          // 4️⃣ Create new assessment if none exists
           const newAssessment = {
             id: `assessment-${jobId}`,
             jobId: jobId,
@@ -58,7 +53,7 @@ const AssessmentBuilder = () => {
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
-      setLoading(false); // ✅ Only stop loading after everything is ready
+      setLoading(false);
     }
   };
 
@@ -74,7 +69,7 @@ const AssessmentBuilder = () => {
 
 
 useEffect(() => {
-  if (!assessment) return; // wait until assessment is loaded
+  if (!assessment) return; 
 
   const savedResponses = localStorage.getItem(`assessment-responses-${assessment.id}`);
   if (savedResponses) {

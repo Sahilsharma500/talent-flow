@@ -9,7 +9,6 @@ import {
   FaSortDown,
 } from 'react-icons/fa';
 
-// A helper function to safely fetch and parse JSON data (recommended for MSW)
 const safelyFetchData = async (url) => {
     try {
         const response = await fetch(url);
@@ -20,9 +19,8 @@ const safelyFetchData = async (url) => {
             const data = await response.json();
             return data.data || [];
         } else if (response.ok) {
-            // Handle non-JSON success (e.g., HTML fallback due to dead worker)
             console.warn(`MSW worker might be asleep. Non-JSON response received from ${url}.`);
-            return []; // Return empty array gracefully
+            return []; 
         } else {
             throw new Error(`HTTP error ${response.status} from ${url}`);
         }
@@ -32,7 +30,6 @@ const safelyFetchData = async (url) => {
     }
 };
 
-// A helper component to render a single row for the virtualized list.
 const Row = ({ index, style, data }) => {
   const navigate = useNavigate();
   const { candidates } = data;
@@ -57,11 +54,8 @@ const Row = ({ index, style, data }) => {
     <div
     onClick={handleClick}
       style={style}
-      // Use flex-row for mobile to align Name/Status side-by-side
       className="w-full flex items-center px-6 py-4 text-sm hover:bg-blue-50 transition-colors duration-150 ease-in-out border-b border-gray-100"
     >
-      {/* Name and Profile Picture (Primary Mobile Column) */}
-      {/* Takes 65% width on mobile, shrinks on desktop */}
       <div className="w-[65%] md:w-[25%] flex items-center">
         <img
           src={candidate.profilePicture}
@@ -75,19 +69,15 @@ const Row = ({ index, style, data }) => {
         </div>
       </div>
 
-      {/* Experience (Hidden on mobile) */}
       <div className="hidden md:w-[20%] md:flex text-gray-700">
         <p className="font-medium text-sm">{candidate.yearsOfExperience} years</p>
       </div>
 
-      {/* Role/Company (Hidden on mobile) */}
       <div className="hidden md:flex flex-col md:w-[35%] text-gray-700">
         <p className="font-semibold truncate">{candidate.previousRole}</p>
         <p className="text-xs text-gray-500 truncate">{candidate.previousCompany}</p>
       </div>
 
-      {/* Status (Secondary Mobile Column) */}
-      {/* Takes 35% width on mobile, shrinks on desktop */}
       <div className="w-[35%] md:w-[20%] flex justify-end md:justify-start flex-shrink-0">
         <span
           className={`
@@ -102,7 +92,6 @@ const Row = ({ index, style, data }) => {
   );
 };
 
-// --- NEW LOADING SKELETON COMPONENT ---
 const CandidatesListSkeleton = () => (
     <div className="p-4 md:p-6 animate-pulse">
         {[...Array(8)].map((_, i) => (
@@ -126,7 +115,7 @@ const CandidatesListSkeleton = () => (
         ))}
     </div>
 );
-// ----------------------------------------
+
 
 
 // Main Candidates Page component
@@ -137,23 +126,20 @@ const CandidatesPage = () => {
   const [activeStage, setActiveStage] = useState('all');
   const [sortKey, setSortKey] = useState('name');
   const [sortDirection, setSortDirection] = useState('asc');
-  const [loading, setLoading] = useState(true); // NEW: Loading state
+  const [loading, setLoading] = useState(true); 
   const stages = ['all', 'applied', 'screening', 'interview', 'offer', 'hired', 'rejected'];
 
   useEffect(() => {
     const fetchCandidates = async () => {
       try {
-        setLoading(true); // Start loading
-        
-        // Use the resilient fetch function
+        setLoading(true);
         const candidates = await safelyFetchData('/candidates');
         setAllCandidates(candidates);
 
       } catch (error) {
-        // Error already logged in safelyFetchData
         setAllCandidates([]);
       } finally {
-        setLoading(false); // Stop loading
+        setLoading(false);
       }
     };
     fetchCandidates();
@@ -254,7 +240,6 @@ const CandidatesPage = () => {
           </div>
         </div>
 
-        {/* Conditional rendering for Loading State */}
         {loading ? (
             <CandidatesListSkeleton />
         ) : (
