@@ -12,9 +12,6 @@ import {
 // A helper component to render a single row for the virtualized list.
 const Row = ({ index, style, data }) => {
   const navigate = useNavigate();
-  const handleClick = () => {
-    navigate(`/candidates/${candidate.id}`);
-  }
   const { candidates } = data;
   const candidate = candidates[index];
 
@@ -29,38 +26,46 @@ const Row = ({ index, style, data }) => {
     rejected: 'bg-red-300 text-red-900',
   };
 
+  const handleClick = () => {
+    navigate(`/candidates/${candidate.id}`);
+  }
+
   return (
     <div
     onClick={handleClick}
       style={style}
-      className="w-full flex flex-col md:flex-row items-start md:items-center px-6 py-4 text-sm hover:bg-blue-50 transition-colors duration-150 ease-in-out border-b border-gray-100"
+      // Use flex-row for mobile to align Name/Status side-by-side
+      className="w-full flex items-center px-6 py-4 text-sm hover:bg-blue-50 transition-colors duration-150 ease-in-out border-b border-gray-100"
     >
-      {/* Name and Email (Desktop) / Name and Profile Photo (Mobile) */}
-      <div className="w-full md:w-[25%] flex items-center mb-2 md:mb-0">
+      {/* Name and Profile Picture (Primary Mobile Column) */}
+      {/* Takes 65% width on mobile, shrinks on desktop */}
+      <div className="w-[65%] md:w-[25%] flex items-center">
         <img
           src={candidate.profilePicture}
           alt={candidate.name}
-          className="w-10 h-10 rounded-full mr-3"
+          className="w-10 h-10 rounded-full mr-3 flex-shrink-0"
         />
-        <div className="flex flex-col">
-          <p className="font-semibold text-blue-900">{candidate.name}</p>
-          <p className="text-xs text-gray-500 md:block hidden">{candidate.email}</p>
+        <div className="flex flex-col min-w-0 flex-grow">
+          <p className="font-semibold text-blue-900 truncate">{candidate.name}</p>
+          {/* Hide email on mobile to save space */}
+          <p className="text-xs text-gray-500 hidden md:block truncate">{candidate.email}</p>
         </div>
       </div>
 
-      {/* Experience */}
-      <div className="w-full md:w-[20%] text-gray-700 mb-2 md:mb-0">
+      {/* Experience (Hidden on mobile) */}
+      <div className="hidden md:w-[20%] md:flex text-gray-700">
         <p className="font-medium text-sm">{candidate.yearsOfExperience} years</p>
       </div>
 
-      {/* Role (Desktop only) */}
-      <div className="hidden md:flex flex-col w-[35%] text-gray-700 mb-2 md:mb-0">
-        <p className="font-semibold">{candidate.previousRole}</p>
-        <p className="text-xs text-gray-500">{candidate.previousCompany}</p>
+      {/* Role/Company (Hidden on mobile) */}
+      <div className="hidden md:flex flex-col md:w-[35%] text-gray-700">
+        <p className="font-semibold truncate">{candidate.previousRole}</p>
+        <p className="text-xs text-gray-500 truncate">{candidate.previousCompany}</p>
       </div>
 
-      {/* Status (always visible) */}
-      <div className="w-full md:w-[20%] flex justify-end md:justify-start">
+      {/* Status (Secondary Mobile Column) */}
+      {/* Takes 35% width on mobile, shrinks on desktop */}
+      <div className="w-[35%] md:w-[20%] flex justify-end md:justify-start flex-shrink-0">
         <span
           className={`
             inline-block px-3 py-1 text-xs font-semibold rounded-full
@@ -211,6 +216,17 @@ const CandidatesPage = () => {
             {SortIcon('stage')}
           </button>
         </div>
+        
+        {/* Mobile Header (New: Shows Name and Status for small screens) */}
+        <div className="md:hidden flex bg-gray-100 text-gray-600 font-bold text-xs uppercase tracking-wider px-6 py-2 border-b border-gray-200">
+          <button onClick={() => handleSort('name')} className="w-[65%] flex items-center">
+            Name
+          </button>
+          <button onClick={() => handleSort('stage')} className="w-[35%] flex justify-end items-center">
+            Status
+          </button>
+        </div>
+
 
         {/* Virtualized List Container */}
         <div className="p-4 md:p-6">

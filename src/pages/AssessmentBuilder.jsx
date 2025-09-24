@@ -14,42 +14,86 @@ const AssessmentBuilder = () => {
   const [selectedQuestion, setSelectedQuestion] = useState(null);
   const [responses, setResponses] = useState({});
 
+  
   useEffect(() => {
-    fetchData();
-  }, [jobId]);
-
   const fetchData = async () => {
+    setLoading(true);
+
     try {
-      setLoading(true);
-      const [jobResponse, assessmentResponse] = await Promise.all([
-        axios.get(`/jobs/${jobId}`),
-        axios
-          .get(`/assessments/${jobId}`)
-          .catch(() => ({ data: { data: null } })),
-      ]);
+      // 1️⃣ Fetch job
+      let fetchedJob = job;
+      if (!job) {
+        const jobResponse = await axios.get(`/jobs/${jobId}`);
+        fetchedJob = jobResponse.data;
+        setJob(fetchedJob);
+      }
 
-      setJob(jobResponse.data);
-      const fetchedAssessment = assessmentResponse.data.data;
-
-      if (fetchedAssessment) {
-        setAssessment(fetchedAssessment);
+      // 2️⃣ Fetch assessment from localStorage
+      const savedAssessment = localStorage.getItem(`builder-${jobId}`);
+      if (savedAssessment) {
+        setAssessment(JSON.parse(savedAssessment));
       } else {
-        const newAssessment = {
-          id: `assessment-${jobId}`,
-          jobId: jobId,
-          title: `Assessment for ${jobResponse.data.title}`,
-          description: "",
-          sections: [],
-          createdAt: new Date(),
-        };
-        setAssessment(newAssessment);
+        // 3️⃣ Fetch from API if not in localStorage
+        const assessmentResponse = await axios
+          .get(`/assessments/${jobId}`)
+          .catch(() => ({ data: { data: null } }));
+
+        const fetchedAssessment = assessmentResponse.data.data;
+
+        if (fetchedAssessment) {
+          setAssessment(fetchedAssessment);
+        } else {
+          // 4️⃣ Create new assessment if none exists
+          const newAssessment = {
+            id: `assessment-${jobId}`,
+            jobId: jobId,
+            title: `Assessment for ${fetchedJob.title}`,
+            description: "",
+            sections: [],
+            createdAt: new Date(),
+          };
+          setAssessment(newAssessment);
+        }
       }
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
-      setLoading(false);
+      setLoading(false); // ✅ Only stop loading after everything is ready
     }
   };
+
+  fetchData();
+}, [jobId]);
+
+
+  useEffect(() => {
+  if (assessment) {
+    localStorage.setItem(`builder-${jobId}`, JSON.stringify(assessment));
+  }
+}, [assessment, jobId]);
+
+
+useEffect(() => {
+  if (!assessment) return; // wait until assessment is loaded
+
+  const savedResponses = localStorage.getItem(`assessment-responses-${assessment.id}`);
+  if (savedResponses) {
+    setResponses(JSON.parse(savedResponses));
+  }
+}, [assessment]);
+
+
+useEffect(() => {
+  if (!assessment) return; 
+
+  localStorage.setItem(
+    `assessment-responses-${assessment.id}`,
+    JSON.stringify(responses)
+  );
+}, [responses, assessment]);
+
+
+  
 
   const addSection = () => {
     if (!assessment) return;
@@ -162,6 +206,7 @@ const AssessmentBuilder = () => {
 
     try {
       await axios.post("/assessments", assessment);
+      localStorage.setItem(`builder-${assessment.jobId}`, JSON.stringify(assessment));
       toast.success("Assessment saved successfully");
       navigate("/assessments");
     } catch (error) {
@@ -258,7 +303,7 @@ const AssessmentBuilder = () => {
             Assessment not found
           </h1>
           <button
-            onClick={() => navigate("/dashboard/assessments")}
+            onClick={() => navigate("/assessments")}
             className="bg-indigo-600 cursor-pointer text-white px-4 py-2 rounded-lg hover:bg-indigo-700"
           >
             Back
@@ -282,7 +327,7 @@ const AssessmentBuilder = () => {
           </div>
           <div className="flex space-x-3">
             <button
-              onClick={() => navigate("/dashboard/assessments")}
+              onClick={() => navigate("/assessments")}
               className="px-4 py-2 cursor-pointer text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
             >
               <span className="md:text-sm text-xs">Cancel</span>

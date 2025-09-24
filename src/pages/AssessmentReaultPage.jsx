@@ -209,7 +209,7 @@ const AssessmentResultsPage = () => {
       <div className="flex justify-between items-center mb-8">
         <div>
           <h1 className="md:text-3xl sm:text-2xl text-xl font-bold text-indigo-700/90 mb-2">
-            Results for "{assessment.title}"
+            Results for {assessment.title}
           </h1>
           <p className="sm:text-sm text-xs text-indigo-600/90">
             Analytics and candidate responses for this assessment.
