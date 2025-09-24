@@ -1,4 +1,4 @@
-// src/seed/assessmentsSeed.js
+
 import { faker } from '@faker-js/faker';
 
 faker.seed(12345);
@@ -11,7 +11,7 @@ function generateQuestion(sectionIndex, questionIndex) {
     id: `q-${sectionIndex}-${questionIndex}`,
     type,
     question: faker.lorem.sentence() + '?',
-    required: faker.datatype.boolean(0.7)
+    required: Math.random() < 0.7
   };
 
   if (type === 'single-choice' || type === 'multi-choice') {

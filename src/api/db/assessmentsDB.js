@@ -2,6 +2,7 @@
 import Dexie from 'dexie';
 import { assessmentsSeed, generateCandidateResponses } from '../seed/assessmentsSeed';
 import { candidatesSeed } from '../seed/candidateSeed'; // Import existing candidate seed
+import { faker } from '@faker-js/faker';
 
 // create database
 export const assessmentsDb = new Dexie('AssessmentsDB');
@@ -42,7 +43,7 @@ export async function saveAssessment(assessment) {
   return assessment;
 }
 
-// This function is now for the mock API, no longer uses localStorage
+
 export async function submitAssessmentResponse(assessmentId, candidateId, responses) {
   const newResponse = {
     id: `response-${Date.now()}`,

@@ -49,8 +49,8 @@ const HomePage = () => {
         </div>
 
         {/* Features */}
-        <div onClick={() => navigate('/jobs')} className="grid grid-cols-1 md:grid-cols-3 gap-8 cursor-pointer">
-          <div className="bg-indigo-50 p-6 rounded-lg text-center hover:shadow-lg transition">
+        <div  className="grid grid-cols-1 md:grid-cols-3 gap-8 cursor-pointer">
+          <div onClick={() => navigate('/jobs')} className="bg-indigo-50 p-6 rounded-lg text-center hover:shadow-lg transition">
             <div className="text-indigo-600 mb-4 text-4xl">📄</div>
             <h3 className="font-semibold text-xl mb-2">Open Positions</h3>
             <p className="text-gray-600">
