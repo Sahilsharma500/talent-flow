@@ -9,6 +9,29 @@ import {
   FaSortDown,
 } from 'react-icons/fa';
 
+// A helper function to safely fetch and parse JSON data (recommended for MSW)
+const safelyFetchData = async (url) => {
+    try {
+        const response = await fetch(url);
+        const contentType = response.headers.get("content-type");
+        const isJson = contentType && contentType.includes("application/json");
+
+        if (response.ok && isJson) {
+            const data = await response.json();
+            return data.data || [];
+        } else if (response.ok) {
+            // Handle non-JSON success (e.g., HTML fallback due to dead worker)
+            console.warn(`MSW worker might be asleep. Non-JSON response received from ${url}.`);
+            return []; // Return empty array gracefully
+        } else {
+            throw new Error(`HTTP error ${response.status} from ${url}`);
+        }
+    } catch (error) {
+        console.error('Error during safe fetch:', error.message);
+        return [];
+    }
+};
+
 // A helper component to render a single row for the virtualized list.
 const Row = ({ index, style, data }) => {
   const navigate = useNavigate();
@@ -79,6 +102,33 @@ const Row = ({ index, style, data }) => {
   );
 };
 
+// --- NEW LOADING SKELETON COMPONENT ---
+const CandidatesListSkeleton = () => (
+    <div className="p-4 md:p-6 animate-pulse">
+        {[...Array(8)].map((_, i) => (
+            <div key={i} className="w-full flex items-center px-6 py-4 text-sm border-b border-gray-100 h-20">
+                <div className="w-[65%] md:w-[25%] flex items-center">
+                    <div className="w-10 h-10 rounded-full mr-3 bg-gray-200"></div>
+                    <div className="flex flex-col space-y-1">
+                        <div className="h-4 bg-gray-200 rounded w-32"></div>
+                        <div className="h-3 bg-gray-100 rounded w-40 hidden md:block"></div>
+                    </div>
+                </div>
+                <div className="hidden md:w-[20%] md:flex h-4 bg-gray-200 rounded w-16"></div>
+                <div className="hidden md:flex flex-col md:w-[35%] space-y-1">
+                    <div className="h-4 bg-gray-200 rounded w-28"></div>
+                    <div className="h-3 bg-gray-100 rounded w-36"></div>
+                </div>
+                <div className="w-[35%] md:w-[20%] flex justify-end md:justify-start flex-shrink-0">
+                    <div className="h-6 bg-gray-200 rounded-full w-20"></div>
+                </div>
+            </div>
+        ))}
+    </div>
+);
+// ----------------------------------------
+
+
 // Main Candidates Page component
 const CandidatesPage = () => {
   const [allCandidates, setAllCandidates] = useState([]);
@@ -87,16 +137,23 @@ const CandidatesPage = () => {
   const [activeStage, setActiveStage] = useState('all');
   const [sortKey, setSortKey] = useState('name');
   const [sortDirection, setSortDirection] = useState('asc');
+  const [loading, setLoading] = useState(true); // NEW: Loading state
   const stages = ['all', 'applied', 'screening', 'interview', 'offer', 'hired', 'rejected'];
 
   useEffect(() => {
     const fetchCandidates = async () => {
       try {
-        const response = await fetch('/candidates');
-        const data = await response.json();
-        setAllCandidates(data.data);
+        setLoading(true); // Start loading
+        
+        // Use the resilient fetch function
+        const candidates = await safelyFetchData('/candidates');
+        setAllCandidates(candidates);
+
       } catch (error) {
-        console.error('Failed to fetch candidates:', error);
+        // Error already logged in safelyFetchData
+        setAllCandidates([]);
+      } finally {
+        setLoading(false); // Stop loading
       }
     };
     fetchCandidates();
@@ -197,54 +254,61 @@ const CandidatesPage = () => {
           </div>
         </div>
 
-        {/* Table Header (Hidden on mobile, uses custom widths for alignment) */}
-        <div className="hidden md:flex bg-blue-100 text-blue-900 font-bold text-sm uppercase tracking-wider px-6 py-4">
-          <button onClick={() => handleSort('name')} className="w-[25%] flex items-center justify-between">
-            Name
-            {SortIcon('name')}
-          </button>
-          <button onClick={() => handleSort('yearsOfExperience')} className="w-[20%] flex items-center justify-between">
-            Experience
-            {SortIcon('yearsOfExperience')}
-          </button>
-          <button onClick={() => handleSort('previousRole')} className="w-[35%] flex items-center justify-between">
-            Role
-            {SortIcon('previousRole')}
-          </button>
-          <button onClick={() => handleSort('stage')} className="w-[20%] flex items-center justify-between">
-            Status
-            {SortIcon('stage')}
-          </button>
-        </div>
-        
-        {/* Mobile Header (New: Shows Name and Status for small screens) */}
-        <div className="md:hidden flex bg-gray-100 text-gray-600 font-bold text-xs uppercase tracking-wider px-6 py-2 border-b border-gray-200">
-          <button onClick={() => handleSort('name')} className="w-[65%] flex items-center">
-            Name
-          </button>
-          <button onClick={() => handleSort('stage')} className="w-[35%] flex justify-end items-center">
-            Status
-          </button>
-        </div>
+        {/* Conditional rendering for Loading State */}
+        {loading ? (
+            <CandidatesListSkeleton />
+        ) : (
+            <>
+                {/* Table Header (Desktop) */}
+             <div className="hidden md:flex bg-blue-100 text-blue-900 font-bold text-sm uppercase tracking-wider px-6 py-4">
+                <button onClick={() => handleSort('name')} className="w-[25%] flex items-center justify-between">
+                    Name
+                    {SortIcon('name')}
+                </button>
+                <button onClick={() => handleSort('yearsOfExperience')} className="w-[20%] flex items-center justify-between">
+                    Experience
+                    {SortIcon('yearsOfExperience')}
+                </button>
+                <button onClick={() => handleSort('previousRole')} className="w-[35%] flex items-center justify-between">
+                    Role
+                    {SortIcon('previousRole')}
+                </button>
+                <button onClick={() => handleSort('stage')} className="w-[20%] flex items-center justify-between">
+                    Status
+                    {SortIcon('stage')}
+                </button>
+                </div>
+                
+                {/* Mobile Header */}
+                <div className="md:hidden flex bg-gray-100 text-gray-600 font-bold text-xs uppercase tracking-wider px-6 py-2 border-b border-gray-200">
+                <button onClick={() => handleSort('name')} className="w-[65%] flex items-center">
+                    Name
+                </button>
+                <button onClick={() => handleSort('stage')} className="w-[35%] flex justify-end items-center">
+                    Status
+                </button>
+                </div>
 
 
-        {/* Virtualized List Container */}
-        <div className="p-4 md:p-6">
-          <FixedSizeList
-            height={600}
-            itemCount={filteredCandidates.length}
-            itemSize={80} // Reduced height for more compact rows
-            width="100%"
-            itemData={listData}
-          >
-            {Row}
-          </FixedSizeList>
-          {filteredCandidates.length === 0 && (
-            <div className="text-center py-10 text-gray-500">
-              No candidates found.
-            </div>
-          )}
-        </div>
+                {/* Virtualized List Container */}
+                <div className="p-4 md:p-6">
+                <FixedSizeList
+                    height={600}
+                    itemCount={filteredCandidates.length}
+                    itemSize={80} // Reduced height for more compact rows
+                    width="100%"
+                    itemData={listData}
+                >
+                    {Row}
+                </FixedSizeList>
+                {filteredCandidates.length === 0 && (
+                    <div className="text-center py-10 text-gray-500">
+                    No candidates found.
+                    </div>
+                )}
+                </div>
+            </>
+        )}
       </div>
     </div>
   );
