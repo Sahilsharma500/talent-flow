@@ -386,6 +386,7 @@ const Jobs = () => {
                         </button>
                         <button
                           onClick={(e) => {
+                            console.log('Clicked delete for', job);
                             e.stopPropagation();
                             setShowDeleteModal(true);
                             setJobToDelete(job);
@@ -466,13 +467,15 @@ const Jobs = () => {
   />
 )}
 
-      {showDeleteModal && jobToDelete && (
-        <DeleteConfirmationModal
-          onClose={() => setShowDeleteModal(false)}
-          onConfirm={() => handleDelete(jobToDelete.id)}
-          message={`Are you sure you want to delete job "${jobToDelete.title}"? This action cannot be undone.`}
-        />
-      )}
+      {jobToDelete && (
+  <DeleteConfirmationModal
+    isOpen={showDeleteModal}
+    onClose={() => setShowDeleteModal(false)}
+    onConfirm={() => handleDelete(jobToDelete.id)}
+    jobTitle={jobToDelete.title}
+  />
+)}
+
     </div>
   );
 };

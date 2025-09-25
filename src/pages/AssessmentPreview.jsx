@@ -70,12 +70,12 @@ const AssessmentPreview = () => {
           const isAnswered = Array.isArray(value) ? value.length > 0 : !!value;
           
           if (!isAnswered) {
-            return false; // Found an unfilled required question
+            return false; 
           }
         }
       }
     }
-    return true; // All visible required questions are filled
+    return true; 
   };
 
 
@@ -95,12 +95,10 @@ const AssessmentPreview = () => {
       setPreviewComplete(true);
       toast.success("Preview completed successfully!");
     } else {
-      // ONLY SHOW TOAST for required fields as requested
       toast.error("All the required questions need to be filled.");
     }
   };
     
-  // Render loading skeleton
   const renderLoading = () => (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="animate-pulse">

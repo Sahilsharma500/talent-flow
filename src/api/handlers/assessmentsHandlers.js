@@ -36,9 +36,9 @@ export const assessmentsHandlers = [
     return HttpResponse.json(savedAssessment);
   }),
 
-  http.get('/assessments/:assessmentId', async ({ params }) => {
+  http.get('/assessments/:jobId', async ({ params }) => {
     await delay();
-    const assessment = await getAssessmentByJobId(params.assessmentId);
+    const assessment = await getAssessmentByJobId(params.jobId);
     return HttpResponse.json(assessment);
   }),
 
