@@ -33,8 +33,10 @@ const AssessmentBuilder = () => {
         const assessmentResponse = await axios
           .get(`/assessments/${jobId}`)
           .catch(() => ({ data: { data: null } }));
-
-        const fetchedAssessment = assessmentResponse.data.data;
+        
+        console.log(assessmentResponse);
+        const fetchedAssessment = assessmentResponse.data;
+        console.log(fetchedAssessment);
 
         if (fetchedAssessment) {
           setAssessment(fetchedAssessment);
