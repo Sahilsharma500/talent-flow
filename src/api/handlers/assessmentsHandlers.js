@@ -11,14 +11,22 @@ import {
 import { delay, maybeFail } from '../../utils/latency';
 
 export const assessmentsHandlers = [
-  http.get('/assessments', async () => {
-    await delay();
-    const assessments = await getAllAssessments();
-    return HttpResponse.json({
-      data: assessments,
-      total: assessments.length
-    });
-  }),
+  http.get('/assessments', async ({ request }) => {
+  await delay();
+  const url = new URL(request.url);
+  const jobId = url.searchParams.get('jobId');
+
+  let assessments = await getAllAssessments();
+  if (jobId) {
+    assessments = assessments.filter(a => a.jobId === jobId);
+  }
+
+  return HttpResponse.json({
+    data: assessments,
+    total: assessments.length
+  });
+}),
+
 
   http.post('/assessments', async ({ request }) => {
     await delay();

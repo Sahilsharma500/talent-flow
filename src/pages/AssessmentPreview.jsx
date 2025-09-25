@@ -32,6 +32,7 @@ const AssessmentPreview = () => {
         ]);
         setJob(jobResponse.data);
         const assessments = assessmentResponse.data.data;
+        console.log(assessmentResponse);
         if (assessments.length > 0) {
           setAssessment(assessments[0]);
         }
