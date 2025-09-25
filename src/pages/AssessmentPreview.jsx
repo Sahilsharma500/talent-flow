@@ -1,22 +1,13 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { toast } from 'react-hot-toast'; 
 
 // Mocks for company and job data for the info page
 const companyInfo = {
   name: "TalentFlow",
   description: "A leading platform for managing candidate assessments and hiring workflows.",
   logoUrl: "https://placehold.co/100x100/A0E7A2/064E3B?text=TF",
-};
-
-// Helper object to map question types to their time limits in seconds
-const questionTimings = {
-  "single-choice": 30,
-  "multi-choice": 40,
-  "short-text": 60,
-  "long-text": 600,
-  "numeric": 120,
-  "file-upload": null, // No time limit
 };
 
 const AssessmentPreview = () => {
@@ -26,12 +17,9 @@ const AssessmentPreview = () => {
   const [assessment, setAssessment] = useState(null);
   const [loading, setLoading] = useState(true);
   const [responses, setResponses] = useState({});
-  const [testStarted, setTestStarted] = useState(false);
-  const [previewComplete, setPreviewComplete] = useState(false); // New state for preview complete
-  const [currentSectionIndex, setCurrentSectionIndex] = useState(0);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [timer, setTimer] = useState(null);
-  const intervalRef = useRef(null);
+  const [formValid, setFormValid] = useState(true); 
+  const [testStarted, setTestStarted] = useState(false); 
+  const [previewComplete, setPreviewComplete] = useState(false); 
 
   // Fetch data on component mount
   useEffect(() => {
@@ -55,34 +43,40 @@ const AssessmentPreview = () => {
     };
     fetchData();
   }, [jobId]);
+    
+  const shouldShowQuestion = (question) => {
+    if (!question.conditionalOn) return true;
 
-  // Handle timer logic
-  useEffect(() => {
-    if (!testStarted || previewComplete || !assessment) return;
-
-    const currentQuestion = assessment.sections[currentSectionIndex]?.questions[currentQuestionIndex];
-    if (!currentQuestion || questionTimings[currentQuestion.type] === null) {
-      clearInterval(intervalRef.current);
-      setTimer(null);
-      return;
+    const conditionalValue = responses[question.conditionalOn.questionId];
+    
+    if (Array.isArray(question.conditionalOn.value)) {
+      return question.conditionalOn.value.includes(conditionalValue);
     }
+    return conditionalValue === question.conditionalOn.value;
+  };
+    
+  const validateRequiredFields = () => {
+    if (!assessment) return true;
 
-    if (timer === null) {
-      setTimer(questionTimings[currentQuestion.type]);
-    }
+    for (const section of assessment.sections) {
+      for (const question of section.questions) {
+        
+        if (!shouldShowQuestion(question)) continue;
 
-    intervalRef.current = setInterval(() => {
-      setTimer((prev) => {
-        if (prev <= 1) {
-          handleNextQuestion();
-          return 0;
+        // 2. Check required status
+        if (question.required) {
+          const value = responses[question.id];
+          const isAnswered = Array.isArray(value) ? value.length > 0 : !!value;
+          
+          if (!isAnswered) {
+            return false; // Found an unfilled required question
+          }
         }
-        return prev - 1;
-      });
-    }, 1000);
+      }
+    }
+    return true; // All visible required questions are filled
+  };
 
-    return () => clearInterval(intervalRef.current);
-  }, [testStarted, previewComplete, assessment, currentSectionIndex, currentQuestionIndex, timer]);
 
   const handleResponseChange = (questionId, value) => {
     setResponses((prev) => ({
@@ -90,25 +84,21 @@ const AssessmentPreview = () => {
       [questionId]: value,
     }));
   };
-
-  const handleNextQuestion = () => {
-    if (!assessment) return;
-
-    const currentSection = assessment.sections[currentSectionIndex];
-    const isLastQuestionInSection = currentQuestionIndex === currentSection.questions.length - 1;
-    const isLastSection = currentSectionIndex === assessment.sections.length - 1;
-
-    if (isLastQuestionInSection && isLastSection) {
+    
+  const handleSubmitForm = (e) => {
+    e.preventDefault();
+    
+    const isFormValid = validateRequiredFields();
+    
+    if (isFormValid) {
       setPreviewComplete(true);
-    } else if (isLastQuestionInSection) {
-      setCurrentSectionIndex((prev) => prev + 1);
-      setCurrentQuestionIndex(0);
+      toast.success("Preview completed successfully!");
     } else {
-      setCurrentQuestionIndex((prev) => prev + 1);
+      // ONLY SHOW TOAST for required fields as requested
+      toast.error("All the required questions need to be filled.");
     }
-    setTimer(null);
   };
-
+    
   // Render loading skeleton
   const renderLoading = () => (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -137,7 +127,7 @@ const AssessmentPreview = () => {
           Back
         </button>
       </div>
-    </div>
+      </div>
   );
 
   const renderInfoPage = () => {
@@ -187,26 +177,15 @@ const AssessmentPreview = () => {
                 </div>
               </div>
 
-              {/* Instructions */}
+              {/* Instructions - Timer info removed */}
               <div className="border rounded-lg p-6 bg-gray-50">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Instructions</h2>
                 <ul className="list-disc list-inside space-y-2 text-gray-700">
-                  <li>This is a timed assessment. Once the timer starts, you cannot go back to previous questions.</li>
-                  <li>Your responses will <strong>not</strong> be saved. This is a preview.</li>
-                  <li>The preview will end upon completion or when the time for each question runs out.</li>
-                  <li>Please ensure you have a stable internet connection.</li>
+                  <li>This is a form preview, designed to test the layout, validation, and conditional logic.</li>
+                  <li>Your responses will **not** be saved.</li>
+                  <li>Required fields are marked with an asterisk (\*).</li>
+                  <li>Questions may appear or disappear based on your answers to previous questions.</li>
                 </ul>
-                <div className="mt-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">Timing per Question Type:</h3>
-                  <ul className="list-disc list-inside space-y-1 text-gray-700">
-                    <li>Single-Choice: <strong>30 seconds</strong></li>
-                    <li>Multiple-Choice: <strong>40 seconds</strong></li>
-                    <li>Short-Answer: <strong>1 minute</strong></li>
-                    <li>Numerical: <strong>2 minutes</strong></li>
-                    <li>Long-Answer: <strong>10 minutes</strong></li>
-                    <li>File-Upload: <strong>No time limit</strong></li>
-                  </ul>
-                </div>
               </div>
             </div>
 
@@ -215,7 +194,7 @@ const AssessmentPreview = () => {
                 onClick={() => setTestStarted(true)}
                 className="px-8 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-bold text-lg transition-colors"
               >
-                Start Test
+                Start Preview
               </button>
             </div>
           </div>
@@ -225,153 +204,156 @@ const AssessmentPreview = () => {
   };
 
   const renderTestPage = () => {
-    const currentSection = assessment.sections[currentSectionIndex];
-    const currentQuestion = currentSection.questions[currentQuestionIndex];
-    const isLastQuestion = currentQuestionIndex === currentSection.questions.length - 1 && currentSectionIndex === assessment.sections.length - 1;
-
-    const hasTimer = questionTimings[currentQuestion.type] !== null;
-
+    
     return (
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6 flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">{currentSection.title}</h1>
-          {hasTimer && (
-            <div className="text-xl font-bold text-gray-800 bg-gray-200 px-4 py-2 rounded-lg">
-              Time Left: {timer !== null ? timer : "..."}s
+          <h1 className="text-2xl font-bold text-gray-900">Assessment Preview</h1>
+        </div>
+        <form onSubmit={handleSubmitForm} className="bg-white rounded-lg shadow-md border border-gray-200 p-8 space-y-10">
+            {/* Removed Form Validation Status Banner */}
+            
+            {assessment.sections.map((section, sectionIndex) => (
+              <div key={section.id} className="space-y-8">
+                <h2 className="text-xl font-bold text-indigo-700 border-b border-indigo-200 pb-2">
+                  {sectionIndex + 1}. {section.title}
+                </h2>
+                <div className="space-y-6">
+                  {section.questions.map((question, questionIndex) => {
+                    
+                    return shouldShowQuestion(question) ? (
+                      <div key={question.id} className={`p-4 border rounded-lg border-gray-200`}>
+                        <label className="block text-sm font-medium text-gray-700">
+                          {questionIndex + 1}. {question.question}
+                          {question.required && <span className="text-red-500 ml-1">*</span>}
+                        </label>
+
+                        {/* Input fields */}
+                        {question.type === "single-choice" && question.options && (
+                          <div className="space-y-2">
+                            {question.options.map((option, index) => (
+                              <label key={index} className="flex items-center">
+                                <input
+                                  type="radio"
+                                  name={question.id}
+                                  value={option}
+                                  checked={responses[question.id] === option}
+                                  onChange={(e) => handleResponseChange(question.id, e.target.value)}
+                                  className="mr-3"
+                                />
+                                <span className="text-sm text-gray-700">{option}</span>
+                              </label>
+                            ))}
+                          </div>
+                        )}
+
+                        {question.type === "multi-choice" && question.options && (
+                          <div className="space-y-2">
+                            {question.options.map((option, index) => (
+                              <label key={index} className="flex items-center">
+                                <input
+                                  type="checkbox"
+                                  checked={responses[question.id]?.includes(option) || false}
+                                  onChange={(e) => {
+                                    const currentValues = responses[question.id] || [];
+                                    const newValues = e.target.checked
+                                      ? [...currentValues, option]
+                                      : currentValues.filter((v) => v !== option);
+                                    handleResponseChange(question.id, newValues);
+                                  }}
+                                  className="mr-3"
+                                />
+                                <span className="text-sm text-gray-700">{option}</span>
+                              </label>
+                            ))}
+                          </div>
+                        )}
+
+                        {question.type === "short-text" && (
+                          <input
+                            type="text"
+                            value={responses[question.id] || ""}
+                            onChange={(e) => handleResponseChange(question.id, e.target.value)}
+                            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 border-gray-300`}
+                            placeholder="Enter your answer..."
+                          />
+                        )}
+
+                        {question.type === "long-text" && (
+                          <textarea
+                            value={responses[question.id] || ""}
+                            onChange={(e) => handleResponseChange(question.id, e.target.value)}
+                            rows={6}
+                            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 border-gray-300`}
+                            placeholder="Enter your detailed answer..."
+                          />
+                        )}
+
+                        {question.type === "numeric" && (
+                          <input
+                            type="number"
+                            value={responses[question.id] || ""}
+                            onChange={(e) => handleResponseChange(question.id, e.target.value)}
+                            className={`w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 border-gray-300`}
+                            placeholder="Enter a number..."
+                          />
+                        )}
+
+                        {question.type === "file-upload" && (
+                          <div className={`border-2 border-dashed rounded-lg p-6 text-center hover:border-gray-400 transition-colors border-gray-300`}>
+                            <svg
+                              className="mx-auto h-12 w-12 text-gray-400"
+                              stroke="currentColor"
+                              fill="none"
+                              viewBox="0 0 48 48"
+                            >
+                              <path
+                                d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
+                                strokeWidth={2}
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                            <p className="mt-2 text-sm text-gray-600">
+                              Click to upload or drag and drop
+                            </p>
+                            <p className="text-xs text-gray-500">PNG, JPG, PDF up to 10MB</p>
+                            <input
+                              type="file"
+                              className="hidden"
+                              id={`file-${question.id}`}
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) handleResponseChange(question.id, file.name);
+                              }}
+                            />
+                            <label
+                              htmlFor={`file-${question.id}`}
+                              className="mt-2 inline-block px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 cursor-pointer"
+                            >
+                              Choose File
+                            </label>
+                            {responses[question.id] && (
+                              <p className="mt-2 text-sm text-gray-600">Selected: {responses[question.id]}</p>
+                            )}
+                          </div>
+                        )}
+                        
+                      </div>
+                    ) : null;
+                  })}
+                </div>
+              </div>
+            ))}
+            <div className="mt-8 pt-6 border-t border-gray-200 flex justify-end">
+              <button
+                type="submit"
+                className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-bold transition-colors"
+              >
+                Finish Preview
+              </button>
             </div>
-          )}
-        </div>
-        <div className="bg-white rounded-lg shadow-md border border-gray-200 p-8">
-          <div className="space-y-6">
-            <div key={currentQuestion.id} className="space-y-4">
-              <label className="block text-lg font-medium text-gray-800">
-                {currentQuestionIndex + 1}. {currentQuestion.question}
-                {currentQuestion.required && <span className="text-red-500 ml-1">*</span>}
-              </label>
-
-              {/* Input fields */}
-              {currentQuestion.type === "single-choice" && currentQuestion.options && (
-                <div className="space-y-2">
-                  {currentQuestion.options.map((option, index) => (
-                    <label key={index} className="flex items-center">
-                      <input
-                        type="radio"
-                        name={currentQuestion.id}
-                        value={option}
-                        checked={responses[currentQuestion.id] === option}
-                        onChange={(e) => handleResponseChange(currentQuestion.id, e.target.value)}
-                        className="mr-3"
-                      />
-                      <span className="text-sm text-gray-700">{option}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-
-              {currentQuestion.type === "multi-choice" && currentQuestion.options && (
-                <div className="space-y-2">
-                  {currentQuestion.options.map((option, index) => (
-                    <label key={index} className="flex items-center">
-                      <input
-                        type="checkbox"
-                        checked={responses[currentQuestion.id]?.includes(option) || false}
-                        onChange={(e) => {
-                          const currentValues = responses[currentQuestion.id] || [];
-                          const newValues = e.target.checked
-                            ? [...currentValues, option]
-                            : currentValues.filter((v) => v !== option);
-                          handleResponseChange(currentQuestion.id, newValues);
-                        }}
-                        className="mr-3"
-                      />
-                      <span className="text-sm text-gray-700">{option}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
-
-              {currentQuestion.type === "short-text" && (
-                <input
-                  type="text"
-                  value={responses[currentQuestion.id] || ""}
-                  onChange={(e) => handleResponseChange(currentQuestion.id, e.target.value)}
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  placeholder="Enter your answer..."
-                />
-              )}
-
-              {currentQuestion.type === "long-text" && (
-                <textarea
-                  value={responses[currentQuestion.id] || ""}
-                  onChange={(e) => handleResponseChange(currentQuestion.id, e.target.value)}
-                  rows={6}
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  placeholder="Enter your detailed answer..."
-                />
-              )}
-
-              {currentQuestion.type === "numeric" && (
-                <input
-                  type="number"
-                  value={responses[currentQuestion.id] || ""}
-                  onChange={(e) => handleResponseChange(currentQuestion.id, e.target.value)}
-                  className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  placeholder="Enter a number..."
-                />
-              )}
-
-              {currentQuestion.type === "file-upload" && (
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-gray-400 transition-colors">
-                  <svg
-                    className="mx-auto h-12 w-12 text-gray-400"
-                    stroke="currentColor"
-                    fill="none"
-                    viewBox="0 0 48 48"
-                  >
-                    <path
-                      d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
-                      strokeWidth={2}
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    />
-                  </svg>
-                  <p className="mt-2 text-sm text-gray-600">
-                    Click to upload or drag and drop
-                  </p>
-                  <p className="text-xs text-gray-500">PNG, JPG, PDF up to 10MB</p>
-                  <input
-                    type="file"
-                    className="hidden"
-                    id={`file-${currentQuestion.id}`}
-                    onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (file) handleResponseChange(currentQuestion.id, file.name);
-                    }}
-                  />
-                  <label
-                    htmlFor={`file-${currentQuestion.id}`}
-                    className="mt-2 inline-block px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 cursor-pointer"
-                  >
-                    Choose File
-                  </label>
-                  {responses[currentQuestion.id] && (
-                    <p className="mt-2 text-sm text-gray-600">Selected: {responses[currentQuestion.id]}</p>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-        <div className="mt-6 flex justify-end">
-          <button
-            onClick={handleNextQuestion}
-            className={`px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 font-bold transition-colors ${
-              isLastQuestion ? "bg-indigo-800 hover:bg-indigo-900" : ""
-            }`}
-          >
-            {isLastQuestion ? "Finish Preview" : "Next Question"}
-          </button>
-        </div>
+        </form>
       </div>
     );
   };

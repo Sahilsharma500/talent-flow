@@ -16,51 +16,50 @@ const AssessmentBuilder = () => {
 
   
   useEffect(() => {
-  const fetchData = async () => {
-    setLoading(true);
+    const fetchData = async () => {
+      setLoading(true);
 
-    try {
-      let fetchedJob = job;
-      if (!job) {
-        const jobResponse = await axios.get(`/jobs/${jobId}`);
-        fetchedJob = jobResponse.data;
-        setJob(fetchedJob);
-      }
-      const savedAssessment = localStorage.getItem(`builder-${jobId}`);
-      if (savedAssessment) {
-        setAssessment(JSON.parse(savedAssessment));
-      } else {
-        const assessmentResponse = await axios
-          .get(`/assessments/${jobId}`)
-          .catch(() => ({ data: { data: null } }));
-        
-        console.log(assessmentResponse);
-        const fetchedAssessment = assessmentResponse.data;
-        console.log(fetchedAssessment);
-
-        if (fetchedAssessment) {
-          setAssessment(fetchedAssessment);
-        } else {
-          const newAssessment = {
-            id: `assessment-${jobId}`,
-            jobId: jobId,
-            title: `Assessment for ${fetchedJob.title}`,
-            description: "",
-            sections: [],
-            createdAt: new Date(),
-          };
-          setAssessment(newAssessment);
+      try {
+        let fetchedJob = job;
+        if (!job) {
+          const jobResponse = await axios.get(`/jobs/${jobId}`);
+          fetchedJob = jobResponse.data;
+          setJob(fetchedJob);
         }
-      }
-    } catch (error) {
-      console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+        const savedAssessment = localStorage.getItem(`builder-${jobId}`);
+        if (savedAssessment) {
+          setAssessment(JSON.parse(savedAssessment));
+        } else {
+          
+          const assessmentResponse = await axios
+            .get(`/assessments/${jobId}`)
+            .catch(() => ({ data: { data: null } }));
+        
+          const fetchedAssessment = assessmentResponse.data;
 
-  fetchData();
-}, [jobId]);
+          if (fetchedAssessment) {
+            setAssessment(fetchedAssessment);
+          } else {
+            const newAssessment = {
+              id: `assessment-${jobId}`,
+              jobId: jobId,
+              title: `Assessment for ${fetchedJob.title}`,
+              description: "",
+              sections: [],
+              createdAt: new Date(),
+            };
+            setAssessment(newAssessment);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [jobId]);
 
 
   useEffect(() => {
@@ -146,7 +145,10 @@ useEffect(() => {
       ...assessment,
       sections: assessment.sections.map((s) =>
         s.id === sectionId
-          ? { ...s, questions: [...s.questions, newQuestion] }
+          ? { 
+                ...s, 
+                questions: [newQuestion, ...s.questions] 
+            }
           : s
       ),
     });
@@ -208,6 +210,7 @@ useEffect(() => {
       navigate("/assessments");
     } catch (error) {
       console.error("Error saving assessment:", error);
+      toast.error("Failed to save assessment.");
     }
   };
 
@@ -365,10 +368,13 @@ useEffect(() => {
             </button>
           </nav>
         </div>
+        
       </div>
 
+      {/* Main Content Area: Now uses grid/flex for side-by-side layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Builder Panel */}
+        
+        {/* Builder Panel (Sections List - Left Column) */}
         {activeTab === "builder" && (
           <div className="space-y-6">
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -436,480 +442,486 @@ useEffect(() => {
                 ))}
               </div>
             </div>
-
-            {/* Question Builder */}
-            {selectedSection && (
-              <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <div className="flex justify-between items-center mb-4">
-                  <h3 className="sm:text-lg text-base font-medium text-gray-900">
-                    Questions
-                  </h3>
-                  <div className="flex space-x-2">
-                    <select
-                      onChange={(e) =>
-                        addQuestion(
-                          selectedSection,
-                          e.target.value
-                        )
-                      }
-                      className="px-3 py-1 border border-gray-300 rounded text-sm"
-                      defaultValue=""
-                    >
-                      <option value="" disabled>
-                        Add Question
-                      </option>
-                      <option value="single-choice">Single Choice</option>
-                      <option value="multi-choice">Multi Choice</option>
-                      <option value="short-text">Short Text</option>
-                      <option value="long-text">Long Text</option>
-                      <option value="numeric">Numeric</option>
-                      <option value="file-upload">File Upload</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className="space-y-4">
-                  {assessment.sections
-                    .find((s) => s.id === selectedSection)
-                    ?.questions.map((question) => (
-                      <div
-                        key={question.id}
-                        className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                          selectedQuestion === question.id
-                            ? "border-indigo-500 bg-indigo-50"
-                            : "border-gray-200 hover:border-gray-300"
-                        }`}
-                        onClick={() => setSelectedQuestion(question.id)}
-                      >
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="flex items-center space-x-2">
-                                <span className="px-2 py-1 text-xs font-medium rounded bg-gray-100 text-gray-700">
-                                  {question.type}
-                                </span>
-                                {question.required && (
-                                  <span className="px-2 py-1 text-xs font-medium rounded bg-red-100 text-red-700">
-                                    Required
-                                  </span>
-                                )}
-                              </div>
-                              <div className="flex items-center space-x-2">
-                                <label className="flex items-center text-xs text-gray-600">
-                                  <input
-                                    type="checkbox"
-                                    checked={question.required}
-                                    onChange={(e) =>
-                                      updateQuestion(
-                                        selectedSection,
-                                        question.id,
-                                        { required: e.target.checked }
-                                      )
-                                    }
-                                    className="mr-1"
-                                    onClick={(e) => e.stopPropagation()}
-                                  />
-                                  Required
-                                </label>
-                              </div>
-                            </div>
-                            <input
-                              type="text"
-                              value={question.question}
-                              onChange={(e) =>
-                                updateQuestion(selectedSection, question.id, {
-                                  question: e.target.value,
-                                })
-                              }
-                              placeholder="Enter question text..."
-                              className="w-full font-medium text-gray-900 bg-transparent border-none outline-none"
-                              onClick={(e) => e.stopPropagation()}
-                            />
-                            {question.options && (
-                              <div className="mt-2 space-y-1">
-                                {question.options.map((option, index) => (
-                                  <div
-                                    key={index}
-                                    className="flex items-center space-x-2"
-                                  >
-                                    <input
-                                      type="text"
-                                      value={option}
-                                      onChange={(e) => {
-                                        const newOptions = [
-                                          ...question.options,
-                                        ];
-                                        newOptions[index] = e.target.value;
-                                        updateQuestion(
-                                          selectedSection,
-                                          question.id,
-                                          { options: newOptions }
-                                        );
-                                      }}
-                                      className="flex-1 text-sm text-gray-600 bg-transparent border-none outline-none"
-                                      onClick={(e) => e.stopPropagation()}
-                                    />
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        const newOptions =
-                                          question.options.filter(
-                                            (_, i) => i !== index
-                                          );
-                                        updateQuestion(
-                                          selectedSection,
-                                          question.id,
-                                          { options: newOptions }
-                                        );
-                                      }}
-                                      className="text-red-600 hover:text-red-700"
-                                    >
-                                      <svg
-                                        className="w-3 h-3"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                      >
-                                        <path
-                                          strokeLinecap="round"
-                                          strokeLinejoin="round"
-                                          strokeWidth={2}
-                                          d="M6 18L18 6M6 6l12 12"
-                                        />
-                                      </svg>
-                                    </button>
-                                  </div>
-                                ))}
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    const newOptions = [
-                                      ...question.options,
-                                      "New Option",
-                                    ];
-                                    updateQuestion(
-                                      selectedSection,
-                                      question.id,
-                                      { options: newOptions }
-                                    );
-                                  }}
-                                  className="text-indigo-600 hover:text-indigo-700 text-sm"
-                                >
-                                  + Add Option
-                                </button>
-                              </div>
-                            )}
-
-                            {/* Validation Settings */}
-                            {(question.type === "short-text" ||
-                              question.type === "long-text" ||
-                              question.type === "numeric") && (
-                              <div className="mt-3 p-3 bg-blue-50 rounded border">
-                                <div className="text-sm font-medium text-gray-700 mb-2">
-                                  Validation Rules
-                                </div>
-                                <div className="grid grid-cols-2 gap-2">
-                                  {question.type === "short-text" ||
-                                  question.type === "long-text" ? (
-                                    <>
-                                      <div>
-                                        <label className="text-xs text-gray-600">
-                                          Min Length
-                                        </label>
-                                        <input
-                                          type="number"
-                                          value={
-                                            question.validation?.minLength || ""
-                                          }
-                                          onChange={(e) =>
-                                            updateQuestion(
-                                              selectedSection,
-                                              question.id,
-                                              {
-                                                validation: {
-                                                  ...question.validation,
-                                                  minLength: e.target.value
-                                                    ? parseInt(e.target.value)
-                                                    : undefined,
-                                                },
-                                              }
-                                            )
-                                          }
-                                          className="w-full text-xs border border-gray-300 rounded px-2 py-1"
-                                          onClick={(e) => e.stopPropagation()}
-                                        />
-                                      </div>
-                                      <div>
-                                        <label className="text-xs text-gray-600">
-                                          Max Length
-                                        </label>
-                                        <input
-                                          type="number"
-                                          value={
-                                            question.validation?.maxLength || ""
-                                          }
-                                          onChange={(e) =>
-                                            updateQuestion(
-                                              selectedSection,
-                                              question.id,
-                                              {
-                                                validation: {
-                                                  ...question.validation,
-                                                  maxLength: e.target.value
-                                                    ? parseInt(e.target.value)
-                                                    : undefined,
-                                                },
-                                              }
-                                            )
-                                          }
-                                          className="w-full text-xs border border-gray-300 rounded px-2 py-1"
-                                          onClick={(e) => e.stopPropagation()}
-                                        />
-                                      </div>
-                                    </>
-                                  ) : (
-                                    <>
-                                      <div>
-                                        <label className="text-xs text-gray-600">
-                                          Min Value
-                                        </label>
-                                        <input
-                                          type="number"
-                                          value={question.validation?.min || ""}
-                                          onChange={(e) =>
-                                            updateQuestion(
-                                              selectedSection,
-                                              question.id,
-                                              {
-                                                validation: {
-                                                  ...question.validation,
-                                                  min: e.target.value
-                                                    ? parseInt(e.target.value)
-                                                    : undefined,
-                                                },
-                                              }
-                                            )
-                                          }
-                                          className="w-full text-xs border border-gray-300 rounded px-2 py-1"
-                                          onClick={(e) => e.stopPropagation()}
-                                        />
-                                      </div>
-                                      <div>
-                                        <label className="text-xs text-gray-600">
-                                          Max Value
-                                        </label>
-                                        <input
-                                          type="number"
-                                          value={question.validation?.max || ""}
-                                          onChange={(e) =>
-                                            updateQuestion(
-                                              selectedSection,
-                                              question.id,
-                                              {
-                                                validation: {
-                                                  ...question.validation,
-                                                  max: e.target.value
-                                                    ? parseInt(e.target.value)
-                                                    : undefined,
-                                                },
-                                              }
-                                            )
-                                          }
-                                          className="w-full text-xs border border-gray-300 rounded px-2 py-1"
-                                          onClick={(e) => e.stopPropagation()}
-                                        />
-                                      </div>
-                                    </>
-                                  )}
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Conditional Logic Setup */}
-                            <div className="mt-3 p-3 bg-gray-50 rounded border">
-                              <div className="flex items-center justify-between mb-2">
-                                <span className="text-sm font-medium text-gray-700">
-                                  Conditional Logic
-                                </span>
-                                {question.conditionalOn ? (
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      removeConditionalLogic(question.id);
-                                    }}
-                                    className="text-red-600 hover:text-red-700 text-sm"
-                                  >
-                                    Remove
-                                  </button>
-                                ) : (
-                                  <button
-                                    onClick={(e) => {
-                                      e.stopPropagation();
-                                      const currentSection =
-                                        assessment.sections.find(
-                                          (s) => s.id === selectedSection
-                                        );
-                                      const currentQuestionIndex =
-                                        currentSection?.questions.findIndex(
-                                          (q) => q.id === question.id
-                                        );
-                                      const previousQuestions =
-                                        currentSection?.questions.slice(
-                                          0,
-                                          currentQuestionIndex
-                                        ) || [];
-
-                                      if (previousQuestions.length > 0) {
-                                        const firstQuestion =
-                                          previousQuestions[0];
-                                        if (
-                                          firstQuestion.options &&
-                                          firstQuestion.options.length > 0
-                                        ) {
-                                          addConditionalLogic(question.id, {
-                                            questionId: firstQuestion.id,
-                                            value: firstQuestion.options[0],
-                                          });
-                                        }
-                                      }
-                                    }}
-                                    className="text-indigo-600 hover:text-indigo-700 text-sm"
-                                  >
-                                    Add Condition
-                                  </button>
-                                )}
-                              </div>
-
-                              {question.conditionalOn && (
-                                <div className="space-y-2">
-                                  <div className="text-xs text-gray-600">
-                                    Show this question only if:
-                                  </div>
-                                  <div className="flex items-center space-x-2">
-                                    <select
-                                      value={question.conditionalOn.questionId}
-                                      onChange={(e) => {
-                                        const currentSection =
-                                          assessment.sections.find(
-                                            (s) => s.id === selectedSection
-                                          );
-                                        const selectedQuestion =
-                                          currentSection?.questions.find(
-                                            (q) => q.id === e.target.value
-                                          );
-                                        if (selectedQuestion?.options) {
-                                          addConditionalLogic(question.id, {
-                                            questionId: e.target.value,
-                                            value: selectedQuestion.options[0],
-                                          });
-                                        }
-                                      }}
-                                      className="text-xs border border-gray-300 rounded px-2 py-1"
-                                      onClick={(e) => e.stopPropagation()}
-                                    >
-                                      {assessment.sections
-                                        .find((s) => s.id === selectedSection)
-                                        ?.questions.filter(
-                                          (q) =>
-                                            q.id !== question.id && q.options
-                                        )
-                                        .map((q) => (
-                                          <option key={q.id} value={q.id}>
-                                            {q.question.substring(0, 50)}...
-                                          </option>
-                                        ))}
-                                    </select>
-                                    <span className="text-xs text-gray-500">
-                                      equals
-                                    </span>
-                                    <select
-                                      value={
-                                        Array.isArray(
-                                          question.conditionalOn.value
-                                        )
-                                          ? question.conditionalOn.value[0]
-                                          : question.conditionalOn.value
-                                      }
-                                      onChange={(e) => {
-                                        const currentSection =
-                                          assessment.sections.find(
-                                            (s) => s.id === selectedSection
-                                          );
-                                        const selectedQuestion =
-                                          currentSection?.questions.find(
-                                            (q) =>
-                                              q.id ===
-                                              question.conditionalOn.questionId
-                                          );
-                                        if (selectedQuestion?.options) {
-                                          addConditionalLogic(question.id, {
-                                            questionId:
-                                              question.conditionalOn.questionId,
-                                            value: e.target.value,
-                                          });
-                                        }
-                                      }}
-                                      className="text-xs border border-gray-300 rounded px-2 py-1"
-                                      onClick={(e) => e.stopPropagation()}
-                                    >
-                                      {(() => {
-                                        const currentSection =
-                                          assessment.sections.find(
-                                            (s) => s.id === selectedSection
-                                          );
-                                        const selectedQuestion =
-                                          currentSection?.questions.find(
-                                            (q) =>
-                                              q.id ===
-                                              question.conditionalOn.questionId
-                                          );
-                                        return (
-                                          selectedQuestion?.options?.map(
-                                            (option) => (
-                                              <option
-                                                key={option}
-                                                value={option}
-                                              >
-                                                {option}
-                                              </option>
-                                            )
-                                          ) || []
-                                        );
-                                      })()}
-                                    </select>
-                                  </div>
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              deleteQuestion(selectedSection, question.id);
-                            }}
-                            className="text-red-600 hover:text-red-700 ml-2"
-                          >
-                            <svg
-                              className="w-4 h-4"
-                              fill="none"
-                              stroke="currentColor"
-                              viewBox="0 0 24 24"
-                            >
-                              <path
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                                strokeWidth={2}
-                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                              />
-                            </svg>
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              </div>
-            )}
           </div>
+        )}
+
+        {/* Question Builder (Right Column) */}
+        {activeTab === "builder" && (
+            <div className="space-y-6">
+                {selectedSection && (
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="sm:text-lg text-base font-medium text-gray-900">
+                                Questions
+                                <span className="text-sm text-gray-500 ml-2">({assessment.sections.find((s) => s.id === selectedSection)?.title})</span>
+                            </h3>
+                            <div className="flex space-x-2">
+                                <select
+                                    onChange={(e) =>
+                                        addQuestion(
+                                            selectedSection,
+                                            e.target.value
+                                        )
+                                    }
+                                    className="px-3 py-1 border border-gray-300 rounded text-sm"
+                                    defaultValue=""
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    <option value="" disabled>
+                                        Add Question
+                                    </option>
+                                    <option value="single-choice">Single Choice</option>
+                                    <option value="multi-choice">Multi Choice</option>
+                                    <option value="short-text">Short Text</option>
+                                    <option value="long-text">Long Text</option>
+                                    <option value="numeric">Numeric</option>
+                                    <option value="file-upload">File Upload</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            {assessment.sections
+                                .find((s) => s.id === selectedSection)
+                                ?.questions.map((question) => (
+                                    <div
+                                        key={question.id}
+                                        className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+                                            selectedQuestion === question.id
+                                                ? "border-indigo-500 bg-indigo-50"
+                                                : "border-gray-200 hover:border-gray-300"
+                                        }`}
+                                        onClick={() => setSelectedQuestion(question.id)}
+                                    >
+                                        <div className="flex justify-between items-start">
+                                            <div className="flex-1">
+                                                <div className="flex items-center justify-between mb-2">
+                                                    <div className="flex items-center space-x-2">
+                                                        <span className="px-2 py-1 text-xs font-medium rounded bg-gray-100 text-gray-700">
+                                                            {question.type}
+                                                        </span>
+                                                        {question.required && (
+                                                            <span className="px-2 py-1 text-xs font-medium rounded bg-red-100 text-red-700">
+                                                                Required
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex items-center space-x-2">
+                                                        <label className="flex items-center text-xs text-gray-600">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={question.required}
+                                                                onChange={(e) =>
+                                                                    updateQuestion(
+                                                                        selectedSection,
+                                                                        question.id,
+                                                                        { required: e.target.checked }
+                                                                    )
+                                                                }
+                                                                className="mr-1"
+                                                                onClick={(e) => e.stopPropagation()}
+                                                            />
+                                                            Required
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <input
+                                                    type="text"
+                                                    value={question.question}
+                                                    onChange={(e) =>
+                                                        updateQuestion(selectedSection, question.id, {
+                                                            question: e.target.value,
+                                                        })
+                                                    }
+                                                    placeholder="Enter question text..."
+                                                    className="w-full font-medium text-gray-900 bg-transparent border-none outline-none"
+                                                    onClick={(e) => e.stopPropagation()}
+                                                />
+                                                {question.options && (
+                                                    <div className="mt-2 space-y-1">
+                                                        {question.options.map((option, index) => (
+                                                            <div
+                                                                key={index}
+                                                                className="flex items-center space-x-2"
+                                                            >
+                                                                <input
+                                                                    type="text"
+                                                                    value={option}
+                                                                    onChange={(e) => {
+                                                                        const newOptions = [
+                                                                            ...question.options,
+                                                                        ];
+                                                                        newOptions[index] = e.target.value;
+                                                                        updateQuestion(
+                                                                            selectedSection,
+                                                                            question.id,
+                                                                            { options: newOptions }
+                                                                        );
+                                                                    }}
+                                                                    className="flex-1 text-sm text-gray-600 bg-transparent border-none outline-none"
+                                                                    onClick={(e) => e.stopPropagation()}
+                                                                />
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        const newOptions =
+                                                                            question.options.filter(
+                                                                                (_, i) => i !== index
+                                                                            );
+                                                                        updateQuestion(
+                                                                            selectedSection,
+                                                                            question.id,
+                                                                            { options: newOptions }
+                                                                        );
+                                                                    }}
+                                                                    className="text-red-600 hover:text-red-700"
+                                                                >
+                                                                    <svg
+                                                                        className="w-3 h-3"
+                                                                        fill="none"
+                                                                        stroke="currentColor"
+                                                                        viewBox="0 0 24 24"
+                                                                    >
+                                                                        <path
+                                                                            strokeLinecap="round"
+                                                                            strokeLinejoin="round"
+                                                                            strokeWidth={2}
+                                                                            d="M6 18L18 6M6 6l12 12"
+                                                                        />
+                                                                    </svg>
+                                                                </button>
+                                                            </div>
+                                                        ))}
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                const newOptions = [
+                                                                    ...question.options,
+                                                                    "New Option",
+                                                                ];
+                                                                updateQuestion(
+                                                                    selectedSection,
+                                                                    question.id,
+                                                                    { options: newOptions }
+                                                                );
+                                                            }}
+                                                            className="text-indigo-600 hover:text-indigo-700 text-sm"
+                                                        >
+                                                            + Add Option
+                                                        </button>
+                                                    </div>
+                                                )}
+
+                                                {/* Validation Settings */}
+                                                {(question.type === "short-text" ||
+                                                    question.type === "long-text" ||
+                                                    question.type === "numeric") && (
+                                                    <div className="mt-3 p-3 bg-blue-50 rounded border">
+                                                        <div className="text-sm font-medium text-gray-700 mb-2">
+                                                            Validation Rules
+                                                        </div>
+                                                        <div className="grid grid-cols-2 gap-2">
+                                                            {question.type === "short-text" ||
+                                                            question.type === "long-text" ? (
+                                                                <>
+                                                                    <div>
+                                                                        <label className="text-xs text-gray-600">
+                                                                            Min Length
+                                                                        </label>
+                                                                        <input
+                                                                            type="number"
+                                                                            value={
+                                                                                question.validation?.minLength || ""
+                                                                            }
+                                                                            onChange={(e) =>
+                                                                                updateQuestion(
+                                                                                    selectedSection,
+                                                                                    question.id,
+                                                                                    {
+                                                                                        validation: {
+                                                                                            ...question.validation,
+                                                                                            minLength: e.target.value
+                                                                                                ? parseInt(e.target.value)
+                                                                                                : undefined,
+                                                                                        },
+                                                                                    }
+                                                                                )
+                                                                            }
+                                                                            className="w-full text-xs border border-gray-300 rounded px-2 py-1"
+                                                                            onClick={(e) => e.stopPropagation()}
+                                                                        />
+                                                                    </div>
+                                                                    <div>
+                                                                        <label className="text-xs text-gray-600">
+                                                                            Max Length
+                                                                        </label>
+                                                                        <input
+                                                                            type="number"
+                                                                            value={
+                                                                                question.validation?.maxLength || ""
+                                                                            }
+                                                                            onChange={(e) =>
+                                                                                updateQuestion(
+                                                                                    selectedSection,
+                                                                                    question.id,
+                                                                                    {
+                                                                                        validation: {
+                                                                                            ...question.validation,
+                                                                                            maxLength: e.target.value
+                                                                                                ? parseInt(e.target.value)
+                                                                                                : undefined,
+                                                                                        },
+                                                                                    }
+                                                                                )
+                                                                            }
+                                                                            className="w-full text-xs border border-gray-300 rounded px-2 py-1"
+                                                                            onClick={(e) => e.stopPropagation()}
+                                                                        />
+                                                                    </div>
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <div>
+                                                                        <label className="text-xs text-gray-600">
+                                                                            Min Value
+                                                                        </label>
+                                                                        <input
+                                                                            type="number"
+                                                                            value={question.validation?.min || ""}
+                                                                            onChange={(e) =>
+                                                                                updateQuestion(
+                                                                                    selectedSection,
+                                                                                    question.id,
+                                                                                    {
+                                                                                        validation: {
+                                                                                            ...question.validation,
+                                                                                            min: e.target.value
+                                                                                                ? parseInt(e.target.value)
+                                                                                                : undefined,
+                                                                                        },
+                                                                                    }
+                                                                                )
+                                                                            }
+                                                                            className="w-full text-xs border border-gray-300 rounded px-2 py-1"
+                                                                            onClick={(e) => e.stopPropagation()}
+                                                                        />
+                                                                    </div>
+                                                                    <div>
+                                                                        <label className="text-xs text-gray-600">
+                                                                            Max Value
+                                                                        </label>
+                                                                        <input
+                                                                            type="number"
+                                                                            value={question.validation?.max || ""}
+                                                                            onChange={(e) =>
+                                                                                updateQuestion(
+                                                                                    selectedSection,
+                                                                                    question.id,
+                                                                                    {
+                                                                                        validation: {
+                                                                                            ...question.validation,
+                                                                                            max: e.target.value
+                                                                                                ? parseInt(e.target.value)
+                                                                                                : undefined,
+                                                                                        },
+                                                                                    }
+                                                                                )
+                                                                            }
+                                                                            className="w-full text-xs border border-gray-300 rounded px-2 py-1"
+                                                                            onClick={(e) => e.stopPropagation()}
+                                                                        />
+                                                                    </div>
+                                                                </>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                )}
+
+                                                {/* Conditional Logic Setup */}
+                                                <div className="mt-3 p-3 bg-gray-50 rounded border">
+                                                    <div className="flex items-center justify-between mb-2">
+                                                        <span className="text-sm font-medium text-gray-700">
+                                                            Conditional Logic
+                                                        </span>
+                                                        {question.conditionalOn ? (
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    removeConditionalLogic(question.id);
+                                                                }}
+                                                                className="text-red-600 hover:text-red-700 text-sm"
+                                                            >
+                                                                Remove
+                                                            </button>
+                                                        ) : (
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    const currentSection =
+                                                                        assessment.sections.find(
+                                                                            (s) => s.id === selectedSection
+                                                                        );
+                                                                    const currentQuestionIndex =
+                                                                        currentSection?.questions.findIndex(
+                                                                            (q) => q.id === question.id
+                                                                        );
+                                                                    const previousQuestions =
+                                                                        currentSection?.questions.slice(
+                                                                            0,
+                                                                            currentQuestionIndex
+                                                                        ) || [];
+
+                                                                    if (previousQuestions.length > 0) {
+                                                                        const firstQuestion =
+                                                                            previousQuestions[0];
+                                                                        if (
+                                                                            firstQuestion.options &&
+                                                                            firstQuestion.options.length > 0
+                                                                        ) {
+                                                                            addConditionalLogic(question.id, {
+                                                                                questionId: firstQuestion.id,
+                                                                                value: firstQuestion.options[0],
+                                                                            });
+                                                                        }
+                                                                    }
+                                                                }}
+                                                                className="text-indigo-600 hover:text-indigo-700 text-sm"
+                                                            >
+                                                                Add Condition
+                                                            </button>
+                                                        )}
+                                                    </div>
+
+                                                    {question.conditionalOn && (
+                                                        <div className="space-y-2">
+                                                            <div className="text-xs text-gray-600">
+                                                                Show this question only if:
+                                                            </div>
+                                                            <div className="flex items-center space-x-2">
+                                                                <select
+                                                                    value={question.conditionalOn.questionId}
+                                                                    onChange={(e) => {
+                                                                        const currentSection =
+                                                                            assessment.sections.find(
+                                                                                (s) => s.id === selectedSection
+                                                                            );
+                                                                        const selectedQuestion =
+                                                                            currentSection?.questions.find(
+                                                                                (q) => q.id === e.target.value
+                                                                            );
+                                                                        if (selectedQuestion?.options) {
+                                                                            addConditionalLogic(question.id, {
+                                                                                questionId: e.target.value,
+                                                                                value: selectedQuestion.options[0],
+                                                                            });
+                                                                        }
+                                                                    }}
+                                                                    className="text-xs border border-gray-300 rounded px-2 py-1"
+                                                                    onClick={(e) => e.stopPropagation()}
+                                                                >
+                                                                    {assessment.sections
+                                                                        .find((s) => s.id === selectedSection)
+                                                                        ?.questions.filter(
+                                                                            (q) =>
+                                                                                q.id !== question.id && q.options
+                                                                        )
+                                                                        .map((q) => (
+                                                                            <option key={q.id} value={q.id}>
+                                                                                {q.question.substring(0, 50)}...
+                                                                            </option>
+                                                                        ))}
+                                                                </select>
+                                                                <span className="text-xs text-gray-500">
+                                                                    equals
+                                                                </span>
+                                                                <select
+                                                                    value={
+                                                                        Array.isArray(
+                                                                            question.conditionalOn.value
+                                                                        )
+                                                                            ? question.conditionalOn.value[0]
+                                                                            : question.conditionalOn.value
+                                                                    }
+                                                                    onChange={(e) => {
+                                                                        const currentSection =
+                                                                            assessment.sections.find(
+                                                                                (s) => s.id === selectedSection
+                                                                            );
+                                                                        const selectedQuestion =
+                                                                            currentSection?.questions.find(
+                                                                                (q) =>
+                                                                                    q.id ===
+                                                                                    question.conditionalOn.questionId
+                                                                            );
+                                                                        if (selectedQuestion?.options) {
+                                                                            addConditionalLogic(question.id, {
+                                                                                questionId:
+                                                                                    question.conditionalOn.questionId,
+                                                                                value: e.target.value,
+                                                                            });
+                                                                        }
+                                                                    }}
+                                                                    className="text-xs border border-gray-300 rounded px-2 py-1"
+                                                                    onClick={(e) => e.stopPropagation()}
+                                                                >
+                                                                    {(() => {
+                                                                        const currentSection =
+                                                                            assessment.sections.find(
+                                                                                (s) => s.id === selectedSection
+                                                                            );
+                                                                        const selectedQuestion =
+                                                                            currentSection?.questions.find(
+                                                                                (q) =>
+                                                                                    q.id ===
+                                                                                    question.conditionalOn.questionId
+                                                                            );
+                                                                        return (
+                                                                            selectedQuestion?.options?.map(
+                                                                                (option) => (
+                                                                                    <option
+                                                                                        key={option}
+                                                                                        value={option}
+                                                                                    >
+                                                                                        {option}
+                                                                                    </option>
+                                                                                )
+                                                                            ) || []
+                                                                        );
+                                                                    })()}
+                                                                </select>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    deleteQuestion(selectedSection, question.id);
+                                                }}
+                                                className="text-red-600 hover:text-red-700 ml-2"
+                                            >
+                                                <svg
+                                                    className="w-4 h-4"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    viewBox="0 0 24 24"
+                                                >
+                                                    <path
+                                                        strokeLinecap="round"
+                                                        strokeLinejoin="round"
+                                                        strokeWidth={2}
+                                                        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                                                    />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                        </div>
+                    </div>
+                )}
+            </div>
         )}
 
         {/* Preview Panel */}
