@@ -10,7 +10,6 @@ const safelyFetchData = async (url, config = {}) => {
     const response = await axios.get(url, config);
     const contentType = response.headers['content-type'];
     
-    // Check for success status and Content-Type header explicitly set by MSW
     if (response.status >= 200 && response.status < 300 && contentType && contentType.includes('application/json')) {
       return response.data;
     }
@@ -23,9 +22,8 @@ const safelyFetchData = async (url, config = {}) => {
     throw new Error(`HTTP error ${response.status} from ${url}`);
 
   } catch (error) {
-    // This catches network errors and the explicit throws above
     console.error(`Error during safe fetch of ${url}:`, error.message);
-    return { data: [], total: 0 }; // Always return a fallback structure
+    return { data: [], total: 0 }; 
   }
 };
 
@@ -116,18 +114,22 @@ const Jobs = () => {
     candidates.filter((candidate) => candidate.jobId === jobId);
 
   const handleReorder = async (fromIndex, toIndex) => {
+    const originalJobs = [...jobs]; 
     const newJobs = [...jobs];
     const [movedJob] = newJobs.splice(fromIndex, 1);
     newJobs.splice(toIndex, 0, movedJob);
-    setJobs(newJobs);
+    setJobs(newJobs); 
+
     try {
       await axios.patch(`/jobs/${movedJob.id}/reorder`, {
-        fromOrder: fromIndex,
+        fromOrder: fromIndex, 
         toOrder: toIndex,
       });
     } catch (error) {
       console.error("Error reordering jobs:", error);
-      fetchJobs();
+      toast.error("Reordering failed. Resetting job list.");
+      setJobs(originalJobs); 
+      fetchJobs(); 
     }
   };
 
@@ -182,25 +184,6 @@ const Jobs = () => {
           <p className="text-indigo-600/100">Create and manage your job postings</p>
         </div>
         <div className="flex items-center space-x-3">
-          {/* <button
-            onClick={() => navigate("/dashboard/candidates")}
-            className="bg-indigo-600 cursor-pointer text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors duration-200 flex items-center space-x-2"
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"
-              />
-            </svg>
-            <span className="md:text-sm text-xs">View Candidates</span>
-          </button> */}
           <button
             onClick={() => setShowCreateModal(true)}
             className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors duration-200 flex items-center space-x-2"
@@ -238,7 +221,7 @@ const Jobs = () => {
             <option value="archived">Archived</option>
           </select>
         </div>
-      </div>
+        </div>
 
       {/* Jobs List */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
