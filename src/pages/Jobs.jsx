@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import JobModal from "../components/JobModal";
@@ -137,7 +137,7 @@ const Jobs = () => {
     setDraggedJob(job);
     e.dataTransfer.effectAllowed = "move";
   };
-
+  const listRef = useRef(null);
   const handleDragOver = (e) => {
     e.preventDefault();
     e.dataTransfer.dropEffect = "move";
@@ -154,6 +154,32 @@ const Jobs = () => {
     handleReorder(draggedIndex, targetIndex);
     setDraggedJob(null);
   };
+
+  useEffect(() => {
+  const container = document.scrollingElement || document.documentElement; // or a specific ref
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+
+    // pixels from edge before scrolling starts
+    const threshold = 100;
+    const scrollSpeed = 10;
+
+    const rect = container.getBoundingClientRect();
+    const y = e.clientY;
+
+    if (y - rect.top < threshold) {
+      // near top
+      container.scrollTop -= scrollSpeed;
+    } else if (rect.bottom - y < threshold) {
+      // near bottom
+      container.scrollTop += scrollSpeed;
+    }
+  };
+
+  window.addEventListener("dragover", handleDragOver);
+  return () => window.removeEventListener("dragover", handleDragOver);
+}, []);
 
   const totalPages = Math.ceil(totalJobs / pageSize);
 
@@ -248,7 +274,7 @@ const Jobs = () => {
             </p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-200 mb-4">
+          <div className="divide-y divide-gray-200 mb-4" ref={listRef}>
             {jobs.map((job, index) => (
               <div
                 key={job.id}

@@ -22,7 +22,7 @@ const CandidateById = () => {
   const [notes, setNotes] = useState("");
   const [newNote, setNewNote] = useState("");
 
-  // stages themed to indigo
+  
   const stages = [
     { id: "applied", name: "Applied", color: "bg-indigo-100 text-indigo-800" },
     {
@@ -40,7 +40,7 @@ const CandidateById = () => {
     { id: "hired", name: "Hired", color: "bg-emerald-100 text-emerald-800" },
   ];
 
-  // NEW: Define the sequential order of stages
+  
   const sequentialStageOrder = [
     "applied", 
     "screening", 
