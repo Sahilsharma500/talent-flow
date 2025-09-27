@@ -14,12 +14,10 @@ const startApp = () => {
   if (!rootElement) return console.error("Root element not found");
 
   createRoot(rootElement).render(
-    <StrictMode>
       <BrowserRouter>
         <App />
         <Toaster />
       </BrowserRouter>
-    </StrictMode>
   );
 };
 
